@@ -24,7 +24,6 @@ export function Navbar() {
       { to: '/find-clinic', label: t.nav.findClinic },
       { to: '/library', label: t.nav.library },
       { to: '/profile', label: t.nav.profile },
-      { to: '/search', label: t.nav.search },
     ] as { to: string; label: string }[]
     if (user && isStaffOrAdmin(user.role_id)) {
       base.splice(4, 0, { to: '/staff', label: t.nav.staff })

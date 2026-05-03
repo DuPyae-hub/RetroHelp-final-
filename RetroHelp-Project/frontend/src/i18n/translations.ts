@@ -8,7 +8,6 @@ export const translations = {
       findClinic: 'Find Clinic',
       library: 'Library',
       profile: 'Profile',
-      search: 'Search',
       staff: 'Staff desk',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
@@ -16,13 +15,35 @@ export const translations = {
     home: {
       eyebrow: 'Care that meets you where you are',
       title: 'You Are Not Alone',
+      titleMy: 'သင်တစ်ယောက်တည်းမဟုတ်ပါ',
       subtitle:
         'Warm, confidential support for community members navigating care, clinics, and everyday questions.',
       cta: 'Find ART Center',
-      trust: 'Private · Respectful · Here for you',
-      trust1: 'Private',
-      trust2: 'Respectful',
-      trust3: 'Here for you',
+      ctaSupport: 'Quick Support Chat',
+      confidenceTitle: 'Why you can trust RetroHelp',
+      confidence1Title: '100% confidential',
+      confidence1Body:
+        'Community members use nicknames and internal IDs only—never legal names in the app—so your identity stays protected.',
+      confidence2Title: 'Verified care',
+      confidence2Body:
+        'ART centres in our directory are verified with international partners such as AHF and The Union before they are listed.',
+      confidence3Title: 'Community first',
+      confidence3Body:
+        'We use neutral, non-judgmental language throughout so you feel respected, not labelled.',
+      topClinicsTitle: 'Top-ranked clinics',
+      topClinicsSub:
+        'Sorted using pill handout success (Given and Received) together with star ratings from community feedback.',
+      viewDirections: 'View directions',
+      clinicsLoading: 'Loading clinics…',
+      clinicsEmpty: 'No clinics to show yet.',
+      reviewsLabel: 'reviews',
+      homeLibraryTitle: 'Mental support library',
+      homeLibrarySub:
+        'Short, welcoming reads on treatment routines and coping—education only, not a substitute for your care team.',
+      readArticle: 'Read',
+      closeArticle: 'Close',
+      modalFootnote:
+        'This information supports health literacy. Always follow your clinician for personal medical decisions.',
     },
     findClinic: {
       title: 'Find a clinic',
@@ -49,11 +70,6 @@ export const translations = {
       recordError: 'Could not save. Please try again.',
       selectHint: 'Choose a center after searching to view the map.',
     },
-    search: {
-      title: 'Search',
-      description: 'Look up ART centers the same way—township and area only, privacy-first.',
-      hint: 'Tip: start broad, then narrow by area.',
-    },
     library: {
       title: 'Resource library',
       description:
@@ -72,14 +88,20 @@ export const translations = {
       cardTitle: 'Community Member',
       cardBody:
         'Account tools and history will appear here as we connect this area to the RetroHelp API.',
-      signIn: 'Sign in (coming soon)',
       privacyNote:
-        'Sessions use HTTPS in production. Tokens stay in your browser session only. We never show legal names for community members—only nicknames you choose.',
+        'In production, traffic uses HTTPS. Your access credential stays in this browser only until you sign out. Community members are identified by nickname only—not legal names.',
+      tabSignIn: 'Sign in',
+      tabRegister: 'Create account',
+      tabStaff: 'Staff',
+      registerIntro:
+        'Create a confidential account with a unique nickname and a strong password (at least 8 characters).',
+      passwordConfirm: 'Confirm password',
+      registerSubmit: 'Create account',
       nicknameLabel: 'Nickname (confidential)',
       nicknameHelp: 'Use a nickname only you recognize. It must be unique.',
       passwordLabel: 'Password',
-      loginCommunity: 'Sign in as community member',
-      loginStaff: 'Sign in as clinic staff',
+      loginCommunity: 'Sign in',
+      loginStaff: 'Sign in as staff',
       fullNameLabel: 'Full name (as registered)',
       saveNickname: 'Save nickname',
       saving: 'Saving…',
@@ -108,6 +130,27 @@ export const translations = {
       busy: 'Confirming…',
       done: 'Thank you—your record is updated.',
       none: 'Nothing waiting for confirmation.',
+    },
+    footer: {
+      quickLinks: 'Quick links',
+      faq: 'FAQ',
+      customerSupport: 'Customer support',
+      aboutUs: 'About us',
+      faqLead:
+        'Answers about privacy, nicknames, how clinic search works, and what RetroHelp can and cannot do.',
+      supportLead:
+        'For technical problems or ideas to improve the platform, reach out through your usual project contact.',
+      aboutLead:
+        'RetroHelp links people to verified ART information with dignity-first language and confidential sign-in.',
+      emergencyTitle: 'Need help right now?',
+      emergencyBody:
+        'If you or someone else is in immediate danger or severe distress, use trusted local emergency or psychosocial services. Hotlines differ by region—keep the numbers you already rely on nearby.',
+      hotline1Label: 'Psychosocial / crisis line (add your local number)',
+      hotline1Number: '—',
+      hotline2Label: 'Medical / general emergency (example)',
+      hotline2Number: '999',
+      languageHeading: 'Language',
+      rights: '© RetroHelp. All rights reserved.',
     },
     support: {
       open: 'Support',
@@ -140,21 +183,42 @@ export const translations = {
       findClinic: 'ဆေးခန်းရှာရန်',
       library: 'လေ့လာရေးစာကြည့်တိုက်',
       profile: 'ကိုယ်ရေးအချက်အလက်',
-      search: 'ရှာဖွေရန်',
       staff: 'စာရေးမှူးကွက်',
       openMenu: 'မီနူးဖွင့်ရန်',
       closeMenu: 'မီနူးပိတ်ရန်',
     },
     home: {
       eyebrow: 'သင့်နေရာမှ စတင်သည့် စောင့်ရှောက်မှု',
-      title: 'သင်တစ်ဦးတည်းမဟုတ်ပါ',
+      title: 'You Are Not Alone',
+      titleMy: 'သင်တစ်ယောက်တည်းမဟုတ်ပါ',
       subtitle:
         'စောင့်ရှောက်မှု၊ ဆေးခန်းများနှင့် နေ့စဉ်မေးခွန်းများအတွက် လျှို့ဝှက်စွာ၊ နွေးထွေးသော အကူအညီ။',
       cta: 'ART စင်တာရှာရန်',
-      trust: 'လျှို့ဝှက် · လေးစားမှု · သင့်ဘေးတွင်',
-      trust1: 'လျှို့ဝှက်',
-      trust2: 'လေးစားမှု',
-      trust3: 'သင့်ဘေးတွင်',
+      ctaSupport: 'အမြန်စကားပြောအကူအညီ',
+      confidenceTitle: 'RetroHelp ကို ယုံကြည်ရခြင်း',
+      confidence1Title: '၁၀၀% လျှို့ဝှက်',
+      confidence1Body:
+        'အဖွဲ့ဝင်များသည် အမည်ပြောင်နှင့် အတွင်းကုဒ်သာသုံးပြီး ဥပဒေအမည်ကို အက်ပ်တွင် မပြပါ။',
+      confidence2Title: 'အတည်ပြုထားသော စောင့်ရှောက်မှု',
+      confidence2Body:
+        'စာရင်းတွင်ပါသော ART စင်တာများကို AHF နှင့် The Union ကဲ့သို့ နိုင်ငံတကာအဖွဲ့များနှင့် အတည်ပြုပြီးမှ ဖော်ပြပါသည်။',
+      confidence3Title: 'အသိုင်းအဝိုင်း အရင်ထား',
+      confidence3Body:
+        'ဝက်ဘ်ဆိုက်တစ်လျှောက်လုံးတွင် လေးစားမှု၊ အပြစ်မတင်သော ဘာသာစကားများကိုသာ သုံးပါသည်။',
+      topClinicsTitle: 'အဆင့်အမြင့်ဆုံး ဆေးခန်းများ',
+      topClinicsSub:
+        'ဆေးပေးမှုအောင်မြင်မှု (ပေးပြီး/လက်ခံမှု) နှင့် ကြယ်ပွင့်အကြံပြုချက်များဖြင့် စီပါသည်။',
+      viewDirections: 'လမ်းညွှန်ကြည့်ရန်',
+      clinicsLoading: 'ဆေးခန်းများ ဖတ်နေသည်…',
+      clinicsEmpty: 'ပြသရန် ဆေးခန်းမရှိသေးပါ။',
+      reviewsLabel: 'သုံးသပ်ချက်များ',
+      homeLibraryTitle: 'စိတ်ပိုင်းဆိုင်ရာ ပံ့ပိုးမှု စာကြည့်တိုက်',
+      homeLibrarySub:
+        'ဆေးပုံစံနှင့် ခံစားချက်စီမံခန့်ခွဲမှု အကြောင်း ဖတ်ရှုရလွယ်ကူပြီး နွေးထွေးသော စာများ—ပညာရေးသာ၊ ဆရာဝန်ညွှန်ကြားချက်မဟုတ်ပါ။',
+      readArticle: 'ဖတ်ရန်',
+      closeArticle: 'ပိတ်ရန်',
+      modalFootnote:
+        'ဤအချက်အလက်များသည် ကျန်းမာရေးဗဟုသုတကို ပံ့ပိုးပါသည်။ ကိုယ်ရေးကိုယ်တာ ဆေးပညာဆုံးဖြတ်ချက်များအတွက် ဆရာဝန်ကို လိုက်နာပါ။',
     },
     findClinic: {
       title: 'ဆေးခန်းရှာရန်',
@@ -182,12 +246,6 @@ export const translations = {
       recordError: 'သိမ်းမရပါ။ ထပ်စမ်းပါ။',
       selectHint: 'ရှာပြီးနောက် စင်တာတစ်ခုကို ရွေးချယ်ပါ။',
     },
-    search: {
-      title: 'ရှာဖွေရန်',
-      description:
-        'တူညီစွာ—မြို့နယ်နှင့် နယ်မြေသာလျှင်၊ ကိုယ်ရေးလျှို့ဝှက်မှုကို အလေးထားပါ။',
-      hint: 'အကြံပြုချက်—အကျယ်အပြန့်မှ စတင်ပြီး နယ်မြေဖြင့် ကျဉ်းပါ။',
-    },
     library: {
       title: 'လေ့လာရေးစာကြည့်တိုက်',
       description:
@@ -206,14 +264,20 @@ export const translations = {
       cardTitle: 'အသိုင်းအဝိုင်း အဖွဲ့ဝင်',
       cardBody:
         'အကောင့်ကိရိယာများနှင့် မှတ်တမ်းများကို RetroHelp API နှင့် ချိတ်ဆက်သည့်အခါ ဤနေရာတွင်မည်ဖြစ်သည်။',
-      signIn: 'ဝင်ရောက်ရန် (မကြာမီ)',
       privacyNote:
-        'ထုတ်သုံးမှုတွင် HTTPS သုံးပါသည်။ လက်မှတ်ကို ဘရောက်ဇာဆက်ရှင်တွင်သာ သိမ်းပါသည်။ အဖွဲ့ဝင်များအတွက် ဥပဒမည်မဟုတ်ဘဲ သင်ရွေးသော အမည်ပြောင်ကိုသာ ပြပါသည်။',
+        'ထုတ်သုံးမှုတွင် HTTPS သုံးပါသည်။ ဝင်ရောက်ခွင့်လက်မှတ်ကို ဤဘရောက်ဇာတွင်သာ သိမ်းထားပြီး ထွက်သည့်အထိ သုံးပါသည်။ အဖွဲ့ဝင်များကို ဥပဒမည်မဟုတ်ဘဲ သင်ရွေးသော အမည်ပြောင်ဖြင့်သာ ခွဲခြားပါသည်။',
+      tabSignIn: 'ဝင်ရောက်ရန်',
+      tabRegister: 'အကောင့်ဖွင့်ရန်',
+      tabStaff: 'ဝန်ထမ်း',
+      registerIntro:
+        'ထူးခြားသော အမည်ပြောင်နှင့် စကားဝှက် အနည်းဆင်း ၈ လုံးဖြင့် လျှို့ဝှက်အကောင့်ဖွင့်ပါ။',
+      passwordConfirm: 'စကားဝှက်အတည်ပြုရန်',
+      registerSubmit: 'အကောင့်ဖွင့်ရန်',
       nicknameLabel: 'အမည်ပြောင် (လျှို့ဝှက်)',
       nicknameHelp: 'သင်သိသော အမည်ပြောင်ကိုသာ သုံးပါ။ ထူးခြားမှုရှိရမည်။',
       passwordLabel: 'စကားဝှက်',
-      loginCommunity: 'အဖွဲ့ဝင်အနေဖြင့် ဝင်ရောက်ရန်',
-      loginStaff: 'ဆေးခန်းဝန်ထမ်းအနေဖြင့် ဝင်ရောက်ရန်',
+      loginCommunity: 'ဝင်ရောက်ရန်',
+      loginStaff: 'ဝန်ထမ်းအနေဖြင့် ဝင်ရောက်ရန်',
       fullNameLabel: 'မှတ်ပုံတင်ထားသော အပြည့်အစုံ အမည်',
       saveNickname: 'အမည်ပြောင်သိမ်းရန်',
       saving: 'သိမ်းနေသည်…',
@@ -242,6 +306,27 @@ export const translations = {
       busy: 'အတည်ပြုနေသည်…',
       done: 'ကျေးဇူးတင်ပါသည်—မှတ်တမ်းပြင်ဆင်ပြီးပါပြီ။',
       none: 'အတည်ပြုရန် စောင့်ဆိုင်းမှု မရှိပါ။',
+    },
+    footer: {
+      quickLinks: 'လင့်ခ်များ',
+      faq: 'မေးခွန်းများ',
+      customerSupport: 'ဖောက်သည်ပံ့ပိုးမှု',
+      aboutUs: 'ကျွန်ုပ်တို့အကြောင်း',
+      faqLead:
+        'လျှို့ဝှက်မှု၊ အမည်ပြောင်၊ ဆေးခန်းရှာဖွေမှု၊ RetroHelp လုပ်နိုင်သည်နှင့် မလုပ်နိုင်သည်များ။',
+      supportLead:
+        'နည်းပညာပြဿနာများ သို့မဟုတ် ပလက်ဖောင်းတိုးတက်ရေးအတွက် ပရောဂျက်ဆက်သွယ်ရမည့်သူကို ဆက်သွယ်ပါ။',
+      aboutLead:
+        'RetroHelp သည် လေးမြတ်မှုအရင်ထားသော ဘာသာစကားနှင့် လျှို့ဝှက်ဝင်ရောက်မှုဖြင့် ART အချက်အလက်များကို ချိတ်ဆက်ပေးသည်။',
+      emergencyTitle: 'အရေးပေါ်အကူအညီ လိုအပ်ပါသလား။',
+      emergencyBody:
+        'သင်ဒါမှမဟုတ် တစ်စုံတစ်ယောက်က အန္တရာယ် သို့မဟုတ် စိတ်ကျပ်တည်းမှုပြင်းထန်ပါက ယုံကြည်ရသော ဒေသတွင်း အရေးပေါ် သို့မဟုတ် စိတ်ပိုင်းဆိုင်ရာ ဝန်ဆောင်မှုများကို သုံးပါ။ ဖုန်းနံပါတ်များသည် ဒေသအလိုက် ကွဲပြားပါသည်။',
+      hotline1Label: 'စိတ်ပိုင်းဆိုင်ရာ / အရေးပေါ် (ဒေသနံပါတ် ထည့်ပါ)',
+      hotline1Number: '—',
+      hotline2Label: 'ဆေးပညာ အရေးပေါ် (ဥပမာ)',
+      hotline2Number: '999',
+      languageHeading: 'ဘာသာစကား',
+      rights: '© RetroHelp။ မူပိုင်ခွင့်ရှိပါသည်။',
     },
     support: {
       open: 'အကူအညီ',

@@ -5,19 +5,25 @@ import { useAuth } from '../context/AuthContext'
 import { isCommunityMember, isStaffOrAdmin } from '../constants/roles'
 import { useLanguage } from '../i18n/LanguageContext'
 
+type GuestTab = 'signin' | 'register' | 'staff'
+
 export function ProfilePage() {
   const { t } = useLanguage()
   const {
     user,
     loading,
+    registerCommunityMember,
     loginCommunityMember,
     loginStaff,
     logout,
     updateNickname,
   } = useAuth()
-  const [tab, setTab] = useState<'community' | 'staff'>('community')
+  const [tab, setTab] = useState<GuestTab>('signin')
   const [nickname, setNickname] = useState('')
   const [password, setPassword] = useState('')
+  const [regNickname, setRegNickname] = useState('')
+  const [regPassword, setRegPassword] = useState('')
+  const [regPassword2, setRegPassword2] = useState('')
   const [fullName, setFullName] = useState('')
   const [staffPassword, setStaffPassword] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
@@ -32,6 +38,25 @@ export function ProfilePage() {
     try {
       await loginCommunityMember(nickname.trim(), password)
       setPassword('')
+    } catch (err) {
+      setFormError(getApiErrorMessage(err))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const onRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setBusy(true)
+    setFormError(null)
+    try {
+      await registerCommunityMember(
+        regNickname.trim(),
+        regPassword,
+        regPassword2,
+      )
+      setRegPassword('')
+      setRegPassword2('')
     } catch (err) {
       setFormError(getApiErrorMessage(err))
     } finally {
@@ -81,6 +106,11 @@ export function ProfilePage() {
     } finally {
       setBusy(false)
     }
+  }
+
+  const switchTab = (next: GuestTab) => {
+    setTab(next)
+    setFormError(null)
   }
 
   if (loading && !user) {
@@ -174,38 +204,43 @@ export function ProfilePage() {
           </div>
         ) : (
           <div className="mt-8 rounded-3xl border border-orange-100/90 bg-white p-6 shadow-xl shadow-teal-900/5 sm:p-8">
-            <div className="flex gap-2 rounded-2xl bg-orange-50/80 p-1">
+            <div className="flex flex-wrap gap-2 rounded-2xl bg-orange-50/80 p-1">
               <button
                 type="button"
-                onClick={() => {
-                  setTab('community')
-                  setFormError(null)
-                }}
-                className={`flex-1 rounded-xl py-2 text-sm font-semibold ${
-                  tab === 'community'
+                onClick={() => switchTab('signin')}
+                className={`min-w-[5.5rem] flex-1 rounded-xl py-2 text-center text-xs font-semibold sm:text-sm ${
+                  tab === 'signin'
                     ? 'bg-white text-teal-800 shadow-sm'
                     : 'text-stone-600'
                 }`}
               >
-                {t.profile.loginCommunity}
+                {t.profile.tabSignIn}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setTab('staff')
-                  setFormError(null)
-                }}
-                className={`flex-1 rounded-xl py-2 text-sm font-semibold ${
+                onClick={() => switchTab('register')}
+                className={`min-w-[5.5rem] flex-1 rounded-xl py-2 text-center text-xs font-semibold sm:text-sm ${
+                  tab === 'register'
+                    ? 'bg-white text-teal-800 shadow-sm'
+                    : 'text-stone-600'
+                }`}
+              >
+                {t.profile.tabRegister}
+              </button>
+              <button
+                type="button"
+                onClick={() => switchTab('staff')}
+                className={`min-w-[5.5rem] flex-1 rounded-xl py-2 text-center text-xs font-semibold sm:text-sm ${
                   tab === 'staff'
                     ? 'bg-white text-teal-800 shadow-sm'
                     : 'text-stone-600'
                 }`}
               >
-                {t.profile.loginStaff}
+                {t.profile.tabStaff}
               </button>
             </div>
 
-            {tab === 'community' ? (
+            {tab === 'signin' && (
               <form onSubmit={onCommunityLogin} className="mt-6 space-y-4">
                 <label className="block text-sm font-medium text-stone-700">
                   {t.profile.nicknameLabel}
@@ -237,7 +272,61 @@ export function ProfilePage() {
                   {t.profile.loginCommunity}
                 </button>
               </form>
-            ) : (
+            )}
+
+            {tab === 'register' && (
+              <form onSubmit={onRegister} className="mt-6 space-y-4">
+                <p className="text-sm leading-relaxed text-stone-600">
+                  {t.profile.registerIntro}
+                </p>
+                <label className="block text-sm font-medium text-stone-700">
+                  {t.profile.nicknameLabel}
+                  <input
+                    required
+                    minLength={2}
+                    maxLength={255}
+                    value={regNickname}
+                    onChange={(e) => setRegNickname(e.target.value)}
+                    className="mt-1 w-full rounded-2xl border border-orange-100 px-4 py-3 font-mono text-stone-900 outline-none ring-teal-500/25 focus:ring-2"
+                    autoComplete="username"
+                  />
+                </label>
+                <p className="text-xs text-stone-500">{t.profile.nicknameHelp}</p>
+                <label className="block text-sm font-medium text-stone-700">
+                  {t.profile.passwordLabel}
+                  <input
+                    required
+                    minLength={8}
+                    type="password"
+                    value={regPassword}
+                    onChange={(e) => setRegPassword(e.target.value)}
+                    className="mt-1 w-full rounded-2xl border border-orange-100 px-4 py-3 text-stone-900 outline-none ring-teal-500/25 focus:ring-2"
+                    autoComplete="new-password"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-stone-700">
+                  {t.profile.passwordConfirm}
+                  <input
+                    required
+                    minLength={8}
+                    type="password"
+                    value={regPassword2}
+                    onChange={(e) => setRegPassword2(e.target.value)}
+                    className="mt-1 w-full rounded-2xl border border-orange-100 px-4 py-3 text-stone-900 outline-none ring-teal-500/25 focus:ring-2"
+                    autoComplete="new-password"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="w-full rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-3 text-sm font-semibold text-white shadow-md disabled:opacity-60"
+                >
+                  {t.profile.registerSubmit}
+                </button>
+              </form>
+            )}
+
+            {tab === 'staff' && (
               <form onSubmit={onStaffLogin} className="mt-6 space-y-4">
                 <p className="text-xs text-stone-500">{t.profile.staffHint}</p>
                 <label className="block text-sm font-medium text-stone-700">

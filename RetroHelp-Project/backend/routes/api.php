@@ -7,9 +7,11 @@ use App\Http\Controllers\PillDispenseController;
 use App\Http\Controllers\ResourceLibraryController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/art-centers/top-ranked', [ArtCenterController::class, 'topRanked']);
 Route::get('/art-centers/search', [ArtCenterController::class, 'search']);
 Route::get('/resource-libraries', [ResourceLibraryController::class, 'index']);
 
+Route::post('/auth/register/patient', [AuthController::class, 'registerPatient']);
 Route::post('/auth/login/patient', [AuthController::class, 'loginPatient']);
 Route::post('/auth/login/staff', [AuthController::class, 'loginStaff']);
 

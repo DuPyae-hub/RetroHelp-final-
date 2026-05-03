@@ -1,12 +1,23 @@
 import { motion } from 'framer-motion'
 import { useLanguage } from '../i18n/LanguageContext'
 
-export function BurmeseToggle({ className = '' }: { className?: string }) {
+export function BurmeseToggle({
+  className = '',
+  tone = 'light',
+}: {
+  className?: string
+  tone?: 'light' | 'dark'
+}) {
   const { lang, setLang, t } = useLanguage()
+  const shell =
+    tone === 'dark'
+      ? 'border-slate-600 bg-slate-800/90 shadow-none backdrop-blur-sm'
+      : 'border-teal-200/80 bg-white/90 shadow-sm shadow-teal-900/5 backdrop-blur-sm'
+  const inactive = tone === 'dark' ? 'text-slate-300 hover:text-white' : 'text-stone-600 hover:text-stone-900'
 
   return (
     <div
-      className={`inline-flex items-center gap-1 rounded-full border border-teal-200/80 bg-white/90 p-1 shadow-sm shadow-teal-900/5 backdrop-blur-sm ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full border p-1 ${shell} ${className}`}
       role="group"
       aria-label={t.lang.toggle}
     >
@@ -14,9 +25,7 @@ export function BurmeseToggle({ className = '' }: { className?: string }) {
         type="button"
         onClick={() => setLang('en')}
         className={`relative rounded-full px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
-          lang === 'en'
-            ? 'text-white'
-            : 'text-stone-600 hover:text-stone-900'
+          lang === 'en' ? 'text-white' : inactive
         }`}
       >
         {lang === 'en' && (
@@ -32,9 +41,7 @@ export function BurmeseToggle({ className = '' }: { className?: string }) {
         type="button"
         onClick={() => setLang('my')}
         className={`relative rounded-full px-3 py-1.5 text-xs font-semibold transition-colors sm:text-sm ${
-          lang === 'my'
-            ? 'text-white'
-            : 'text-stone-600 hover:text-stone-900'
+          lang === 'my' ? 'text-white' : inactive
         }`}
       >
         {lang === 'my' && (

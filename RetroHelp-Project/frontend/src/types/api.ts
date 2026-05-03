@@ -7,6 +7,17 @@ export type ResourceLibraryItem = {
   updated_at: string | null
 }
 
+export type TopRankedClinic = {
+  id: number
+  name: string
+  township: string | null
+  area: string | null
+  rating_avg: string | number | null
+  total_reviews: number | null
+  is_verified: boolean
+  pill_success_count?: number
+}
+
 export type ArtCenterSearchItem = {
   id: number
   name: string

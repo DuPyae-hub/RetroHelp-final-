@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { useSupportOpener } from '../context/SupportOpenerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 
 type Tab = 'ai' | 'live'
@@ -8,6 +9,7 @@ type ChatMessage = { id: string; role: 'user' | 'bot'; text: string }
 
 export function FloatingSupport() {
   const { lang, t } = useLanguage()
+  const { registerOpen } = useSupportOpener()
   const [open, setOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('ai')
   const [input, setInput] = useState('')
@@ -18,6 +20,15 @@ export function FloatingSupport() {
       { id: `welcome-${lang}`, role: 'bot', text: t.support.botWelcome },
     ])
   }, [lang, t])
+
+  useEffect(() => {
+    const openPanel = () => {
+      setTab('ai')
+      setOpen(true)
+    }
+    registerOpen(openPanel)
+    return () => registerOpen(null)
+  }, [registerOpen])
 
   const send = () => {
     const trimmed = input.trim()

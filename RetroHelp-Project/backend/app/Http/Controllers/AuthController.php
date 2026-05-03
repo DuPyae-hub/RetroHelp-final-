@@ -15,6 +15,23 @@ class AuthController extends Controller
 {
     use BuildsSafeUserPayload;
 
+    public function registerPatient(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'nickname' => ['required', 'string', 'max:255', 'unique:users,nickname'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = User::query()->create([
+            'nickname' => $data['nickname'],
+            'password' => $data['password'],
+            'role_id' => RoleId::Patient,
+            'is_verified' => false,
+        ]);
+
+        return $this->tokenResponse($user, 'patient');
+    }
+
     public function loginPatient(Request $request): JsonResponse
     {
         $credentials = $request->validate([

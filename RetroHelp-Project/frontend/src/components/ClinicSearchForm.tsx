@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { api, getApiErrorMessage } from '../api/client'
 import { useAuth } from '../context/AuthContext'
 import { isCommunityMember } from '../constants/roles'
@@ -7,17 +7,17 @@ import { useLanguage } from '../i18n/LanguageContext'
 import type { ArtCenterDetail, ArtCenterSearchItem } from '../types/api'
 import { ClinicMapPanel } from './ClinicMapPanel'
 
-type Props = {
-  variant?: 'default' | 'compact'
-}
-
 function parseCoord(v: string | number | null | undefined): number | null {
   if (v === null || v === undefined || v === '') return null
   const n = typeof v === 'number' ? v : Number.parseFloat(String(v))
   return Number.isFinite(n) ? n : null
 }
 
-export function ClinicSearchForm({ variant = 'default' }: Props) {
+export function ClinicSearchForm({
+  initialCenterId = null,
+}: {
+  initialCenterId?: number | null
+}) {
   const { t } = useLanguage()
   const { user, token } = useAuth()
   const [township, setTownship] = useState('')
@@ -59,27 +59,35 @@ export function ClinicSearchForm({ variant = 'default' }: Props) {
     }
   }
 
-  const openCenter = async (id: number) => {
-    setSelectedId(id)
-    setDetail(null)
-    setDetailError(null)
-    setRecordMsg(null)
-    setRecordOk(null)
-    if (!isPatient) {
-      return
-    }
-    setDetailLoading(true)
-    try {
-      const { data } = await api.get<{ data: ArtCenterDetail }>(
-        `/api/art-centers/${id}`,
-      )
-      setDetail(data.data)
-    } catch (err) {
-      setDetailError(getApiErrorMessage(err))
-    } finally {
-      setDetailLoading(false)
-    }
-  }
+  const openCenter = useCallback(
+    async (id: number) => {
+      setSelectedId(id)
+      setDetail(null)
+      setDetailError(null)
+      setRecordMsg(null)
+      setRecordOk(null)
+      if (!isPatient) {
+        return
+      }
+      setDetailLoading(true)
+      try {
+        const { data } = await api.get<{ data: ArtCenterDetail }>(
+          `/api/art-centers/${id}`,
+        )
+        setDetail(data.data)
+      } catch (err) {
+        setDetailError(getApiErrorMessage(err))
+      } finally {
+        setDetailLoading(false)
+      }
+    },
+    [isPatient],
+  )
+
+  useEffect(() => {
+    if (initialCenterId == null) return
+    void openCenter(initialCenterId)
+  }, [initialCenterId, openCenter])
 
   const recordVisit = async () => {
     if (!selectedId || !isPatient) return
@@ -105,7 +113,7 @@ export function ClinicSearchForm({ variant = 'default' }: Props) {
     <div className="space-y-6">
       <form
         onSubmit={search}
-        className={`grid gap-3 ${variant === 'compact' ? 'sm:grid-cols-2' : 'sm:grid-cols-2 lg:grid-cols-3'}`}
+        className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
       >
         <label className="flex flex-col gap-1.5 text-sm font-medium text-stone-700">
           {t.findClinic.township}
@@ -125,9 +133,7 @@ export function ClinicSearchForm({ variant = 'default' }: Props) {
             className="rounded-2xl border border-orange-100 bg-white px-4 py-3 text-stone-900 shadow-inner shadow-stone-900/5 outline-none ring-teal-500/25 focus:ring-2"
           />
         </label>
-        <div
-          className={`flex items-end ${variant === 'compact' ? 'sm:col-span-2' : 'sm:col-span-2 lg:col-span-1'}`}
-        >
+        <div className="flex items-end sm:col-span-2 lg:col-span-1">
           <motion.button
             type="submit"
             disabled={loading}

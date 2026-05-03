@@ -1,9 +1,18 @@
 import { motion } from 'framer-motion'
-import { useLanguage } from '../i18n/LanguageContext'
+import { useMemo } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { ClinicSearchForm } from '../components/ClinicSearchForm'
+import { useLanguage } from '../i18n/LanguageContext'
 
 export function FindClinicPage() {
   const { t } = useLanguage()
+  const [params] = useSearchParams()
+  const initialCenterId = useMemo(() => {
+    const raw = params.get('center')
+    if (!raw) return null
+    const n = Number.parseInt(raw, 10)
+    return Number.isFinite(n) && n > 0 ? n : null
+  }, [params])
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -19,7 +28,7 @@ export function FindClinicPage() {
           {t.findClinic.description}
         </p>
       </motion.div>
-      <ClinicSearchForm />
+      <ClinicSearchForm initialCenterId={initialCenterId} />
     </div>
   )
 }

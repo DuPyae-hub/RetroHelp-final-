@@ -7,7 +7,7 @@ import {
   useState,
   type ReactNode,
 } from 'react'
-import { api, getApiErrorMessage, getStoredToken, setStoredToken } from '../api/client'
+import { api, getStoredToken, setStoredToken } from '../api/client'
 import { ROLE } from '../constants/roles'
 import type { SafeUser } from '../types/auth'
 
@@ -15,6 +15,11 @@ type AuthContextValue = {
   user: SafeUser | null
   token: string | null
   loading: boolean
+  registerCommunityMember: (
+    nickname: string,
+    password: string,
+    passwordConfirmation: string,
+  ) => Promise<void>
   loginCommunityMember: (nickname: string, password: string) => Promise<void>
   loginStaff: (fullName: string, password: string) => Promise<void>
   logout: () => Promise<void>
@@ -51,6 +56,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refreshUser()
   }, [refreshUser])
+
+  const registerCommunityMember = useCallback(
+    async (nickname: string, password: string, passwordConfirmation: string) => {
+      const { data } = await api.post<{ token: string; user: SafeUser }>(
+        '/api/auth/register/patient',
+        {
+          nickname,
+          password,
+          password_confirmation: passwordConfirmation,
+        },
+      )
+      setStoredToken(data.token)
+      setToken(data.token)
+      setUser(data.user)
+    },
+    [],
+  )
 
   const loginCommunityMember = useCallback(async (nickname: string, password: string) => {
     const { data } = await api.post<{ token: string; user: SafeUser }>(
@@ -99,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       token,
       loading,
+      registerCommunityMember,
       loginCommunityMember,
       loginStaff,
       logout,
@@ -109,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       token,
       loading,
+      registerCommunityMember,
       loginCommunityMember,
       loginStaff,
       logout,
@@ -125,5 +149,3 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
   return ctx
 }
-
-export { getApiErrorMessage }

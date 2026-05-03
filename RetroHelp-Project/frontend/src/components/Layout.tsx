@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Outlet, useLocation } from 'react-router-dom'
 import { FloatingSupport } from './FloatingSupport'
+import { Footer } from './Footer'
 import { Navbar } from './Navbar'
 
 const pageVariants = {
@@ -26,6 +27,7 @@ export function Layout() {
       >
         <Outlet />
       </motion.main>
+      <Footer />
       <FloatingSupport />
     </div>
   )

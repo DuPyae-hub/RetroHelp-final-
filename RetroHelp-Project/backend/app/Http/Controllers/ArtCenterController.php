@@ -9,6 +9,39 @@ use Illuminate\Http\Request;
 class ArtCenterController extends Controller
 {
     /**
+     * Top clinics for public home: ranked by pill handout success (Given + Received) and feedback scores.
+     */
+    public function topRanked(Request $request): JsonResponse
+    {
+        $limit = min(max((int) $request->query('limit', 12), 1), 30);
+
+        $query = ArtCenter::query()
+            ->select([
+                'art_centers.id',
+                'art_centers.name',
+                'art_centers.township',
+                'art_centers.area',
+                'art_centers.rating_avg',
+                'art_centers.total_reviews',
+                'art_centers.is_verified',
+            ])
+            ->withCount([
+                'pillDispenses as pill_success_count' => static function ($q): void {
+                    $q->whereIn('status', ['Given', 'Received']);
+                },
+            ])
+            ->orderByDesc('pill_success_count')
+            ->orderByDesc('rating_avg')
+            ->orderByDesc('total_reviews')
+            ->orderBy('art_centers.name')
+            ->limit($limit);
+
+        return response()->json([
+            'data' => $query->get(),
+        ]);
+    }
+
+    /**
      * Privacy-first listing: filter by township and/or area only; omit direct contact and coordinates.
      * Results are ranked by completed pill dispenses (status Received) at each center.
      */
