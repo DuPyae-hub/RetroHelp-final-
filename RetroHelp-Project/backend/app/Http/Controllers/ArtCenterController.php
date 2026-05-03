@@ -50,4 +50,22 @@ class ArtCenterController extends Controller
             'data' => $query->get(),
         ]);
     }
+
+    /**
+     * Map-safe details for authenticated users only (coordinates are not exposed in public search).
+     */
+    public function show(ArtCenter $artCenter): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'id' => $artCenter->id,
+                'name' => $artCenter->name,
+                'township' => $artCenter->township,
+                'area' => $artCenter->area,
+                'latitude' => $artCenter->latitude,
+                'longitude' => $artCenter->longitude,
+                'is_verified' => (bool) $artCenter->is_verified,
+            ],
+        ]);
+    }
 }

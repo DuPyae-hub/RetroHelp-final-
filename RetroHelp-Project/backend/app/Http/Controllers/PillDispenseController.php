@@ -9,8 +9,59 @@ use Illuminate\Http\Request;
 class PillDispenseController extends Controller
 {
     /**
-     * Staff or admin marks a dispense as Given and records when the medication was handed out.
+     * Staff: pending dispenses assigned to this user (patient identified by nickname only).
      */
+    public function pendingForStaff(Request $request): JsonResponse
+    {
+        $rows = PillDispense::query()
+            ->select(['dispense_id', 'patient_id', 'staff_id', 'status', 'created_at', 'art_center_id'])
+            ->with([
+                'patient:id,nickname,role_id',
+                'artCenter:id,name',
+            ])
+            ->where('staff_id', $request->user()->id)
+            ->where('status', 'Pending')
+            ->orderByDesc('created_at')
+            ->get();
+
+        $data = $rows->map(static function (PillDispense $d): array {
+            return [
+                'dispense_id' => $d->dispense_id,
+                'status' => $d->status,
+                'created_at' => $d->created_at,
+                'community_member_display' => $d->patient?->nickname ?? '—',
+                'art_center_name' => $d->artCenter?->name,
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
+    /**
+     * Community member: dispenses waiting for receipt confirmation.
+     */
+    public function awaitingReceipt(Request $request): JsonResponse
+    {
+        $rows = PillDispense::query()
+            ->select(['dispense_id', 'status', 'dispense_date', 'art_center_id'])
+            ->with(['artCenter:id,name'])
+            ->where('patient_id', $request->user()->id)
+            ->where('status', 'Given')
+            ->orderByDesc('dispense_date')
+            ->get();
+
+        $data = $rows->map(static function (PillDispense $d): array {
+            return [
+                'dispense_id' => $d->dispense_id,
+                'status' => $d->status,
+                'dispense_date' => $d->dispense_date,
+                'art_center_name' => $d->artCenter?->name,
+            ];
+        });
+
+        return response()->json(['data' => $data]);
+    }
+
     public function markGiven(Request $request, PillDispense $pillDispense): JsonResponse
     {
         if ((int) $pillDispense->staff_id !== (int) $request->user()->id) {
@@ -30,17 +81,18 @@ class PillDispenseController extends Controller
 
         return response()->json([
             'message' => 'Dispense marked as Given.',
-            'pill_dispense' => $pillDispense->fresh(),
+            'data' => [
+                'dispense_id' => $pillDispense->dispense_id,
+                'status' => $pillDispense->fresh()->status,
+                'dispense_date' => $pillDispense->dispense_date,
+            ],
         ]);
     }
 
-    /**
-     * Patient confirms they received the medication.
-     */
     public function markReceived(Request $request, PillDispense $pillDispense): JsonResponse
     {
         if ((int) $pillDispense->patient_id !== (int) $request->user()->id) {
-            abort(403, 'Only the patient on this record can mark it as received.');
+            abort(403, 'Only the community member on this record can confirm receipt.');
         }
 
         if ($pillDispense->status !== 'Given') {
@@ -54,8 +106,11 @@ class PillDispenseController extends Controller
         ]);
 
         return response()->json([
-            'message' => 'Dispense marked as Received.',
-            'pill_dispense' => $pillDispense->fresh(),
+            'message' => 'Receipt confirmed.',
+            'data' => [
+                'dispense_id' => $pillDispense->dispense_id,
+                'status' => $pillDispense->fresh()->status,
+            ],
         ]);
     }
 }
