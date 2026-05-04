@@ -9,11 +9,39 @@ function normalizeApiBase(raw: string | undefined): string {
   return t.replace(/\/+$/, '')
 }
 
-/** In dev, default to Laravel on :8000 when VITE_API_BASE_URL is missing or blank (avoids Vite /api proxy 502). */
+function devArtisanPort(): number {
+  const raw = import.meta.env.VITE_API_PORT as string | undefined
+  if (raw == null || String(raw).trim() === '') return 8000
+  const n = Number.parseInt(String(raw), 10)
+  return Number.isFinite(n) && n > 0 && n < 65536 ? n : 8000
+}
+
+/**
+ * When VITE_API_BASE_URL is unset, pick a Laravel URL that matches how you opened the app
+ * (localhost vs LAN IP vs Herd *.test). Avoids unreachable 127.0.0.1 from another device.
+ */
+function inferDevApiBaseFromWindow(): string {
+  const port = devArtisanPort()
+  if (typeof window === 'undefined') {
+    return `http://127.0.0.1:${port}`
+  }
+  const { hostname, protocol } = window.location
+  if (hostname === 'localhost') return `http://localhost:${port}`
+  if (hostname === '127.0.0.1') return `http://127.0.0.1:${port}`
+  if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname) || /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
+    return `http://${hostname}:${port}`
+  }
+  if (hostname.endsWith('.test')) {
+    const proto = protocol === 'https:' ? 'https' : 'http'
+    return `${proto}://${hostname}`
+  }
+  return `http://127.0.0.1:${port}`
+}
+
 function resolveApiBaseURL(): string {
   const fromEnv = normalizeApiBase(import.meta.env.VITE_API_BASE_URL as string | undefined)
   if (fromEnv) return fromEnv
-  if (import.meta.env.DEV) return 'http://127.0.0.1:8000'
+  if (import.meta.env.DEV) return inferDevApiBaseFromWindow()
   return ''
 }
 
@@ -52,7 +80,13 @@ api.interceptors.request.use((config) => {
 
 export function getApiErrorMessage(err: unknown): string {
   const ax = err as AxiosError<{ message?: string; errors?: Record<string, string[]> }>
-  if (!ax.response) return ax.message || 'Network error'
+  if (!ax.response) {
+    if (import.meta.env.DEV) {
+      const base = resolveApiBaseURL()
+      return `${ax.message || 'Network error'} (dev API base: ${base || '(empty)'}). If you opened this app from another device, run: php artisan serve --host=0.0.0.0 --port=${devArtisanPort()} and npm run dev -- --host. Or set VITE_API_BASE_URL in frontend/.env.development.`
+    }
+    return ax.message || 'Network error'
+  }
   if (ax.response.status === 502) {
     return 'Bad gateway: the Vite /api proxy could not reach PHP. Start Laravel (php artisan serve, default port 8000), or set VITE_API_BASE_URL in frontend/.env.development to your API URL, then restart npm run dev.'
   }
