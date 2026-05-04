@@ -39,7 +39,7 @@ export function getApiErrorMessage(err: unknown): string {
   const ax = err as AxiosError<{ message?: string; errors?: Record<string, string[]> }>
   if (!ax.response) return ax.message || 'Network error'
   if (ax.response.status === 502) {
-    return 'Bad gateway: the API server is not reachable from the dev proxy. Start Laravel (e.g. php artisan serve), match its port to VITE_API_PROXY_TARGET in frontend/.env, or set VITE_API_BASE_URL to the running API URL.'
+    return 'Bad gateway: the dev proxy could not reach Laravel. Ensure php artisan serve is running on the port in frontend/.env.development (VITE_API_PROXY_TARGET), or use VITE_API_BASE_URL to call Laravel directly, then restart npm run dev.'
   }
   const data = ax.response.data as unknown
   if (typeof data === 'string' && data.includes('<!DOCTYPE')) {

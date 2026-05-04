@@ -31,7 +31,17 @@ return [
         )),
     ))),
 
-    'allowed_origins_patterns' => [],
+    /*
+     * When APP_ENV=local, allow typical dev frontends (LAN IP, Herd/Valet .test) so
+     * VITE_API_BASE_URL (browser → Laravel) still passes CORS without editing .env.
+     */
+    'allowed_origins_patterns' => env('APP_ENV') === 'local'
+        ? [
+            '#^https?://(localhost|127\.0\.0\.1)(:\d+)?$#',
+            '#^https?://192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$#',
+            '#^https?://[\w.-]+\.test(:\d+)?$#',
+        ]
+        : [],
 
     'allowed_headers' => ['*'],
 
