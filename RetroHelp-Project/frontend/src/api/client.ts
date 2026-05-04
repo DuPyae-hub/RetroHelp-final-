@@ -2,8 +2,23 @@ import axios, { type AxiosError } from 'axios'
 
 const TOKEN_KEY = 'retrohelp_token'
 
+function normalizeApiBase(raw: string | undefined): string {
+  if (raw == null) return ''
+  const t = String(raw).trim()
+  if (!t) return ''
+  return t.replace(/\/+$/, '')
+}
+
+/** In dev, default to Laravel on :8000 when VITE_API_BASE_URL is missing or blank (avoids Vite /api proxy 502). */
+function resolveApiBaseURL(): string {
+  const fromEnv = normalizeApiBase(import.meta.env.VITE_API_BASE_URL as string | undefined)
+  if (fromEnv) return fromEnv
+  if (import.meta.env.DEV) return 'http://127.0.0.1:8000'
+  return ''
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? '',
+  baseURL: resolveApiBaseURL(),
   headers: {
     Accept: 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
@@ -39,7 +54,7 @@ export function getApiErrorMessage(err: unknown): string {
   const ax = err as AxiosError<{ message?: string; errors?: Record<string, string[]> }>
   if (!ax.response) return ax.message || 'Network error'
   if (ax.response.status === 502) {
-    return 'Bad gateway: the dev proxy could not reach Laravel. Ensure php artisan serve is running on the port in frontend/.env.development (VITE_API_PROXY_TARGET), or use VITE_API_BASE_URL to call Laravel directly, then restart npm run dev.'
+    return 'Bad gateway: the Vite /api proxy could not reach PHP. Start Laravel (php artisan serve, default port 8000), or set VITE_API_BASE_URL in frontend/.env.development to your API URL, then restart npm run dev.'
   }
   const data = ax.response.data as unknown
   if (typeof data === 'string' && data.includes('<!DOCTYPE')) {
