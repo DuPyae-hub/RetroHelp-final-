@@ -15,6 +15,17 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: apiProxyTarget,
           changeOrigin: true,
+          configure(proxy) {
+            proxy.on('error', (err: NodeJS.ErrnoException) => {
+              const code = err.code ? `${err.code} ` : ''
+              console.warn(
+                `\n[vite] /api proxy → ${apiProxyTarget}\n` +
+                  `[vite] ${code}${err.message}\n` +
+                  `[vite] Start the API: cd RetroHelp-Project/backend && php artisan serve\n` +
+                  `[vite] Or set VITE_API_PROXY_TARGET in frontend/.env.development to your Laravel URL/port.\n`,
+              )
+            })
+          },
         },
       },
     },
