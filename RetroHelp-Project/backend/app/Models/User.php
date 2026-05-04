@@ -20,6 +20,7 @@ class User extends Authenticatable
         'full_name',
         'password',
         'role_id',
+        'art_center_id',
         'is_verified',
     ];
 
@@ -40,19 +41,19 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function artCenter(): BelongsTo
+    {
+        return $this->belongsTo(ArtCenter::class, 'art_center_id');
+    }
+
     public function navigations(): HasMany
     {
         return $this->hasMany(Navigation::class, 'user_id');
     }
 
-    public function pillDispensesAsPatient(): HasMany
+    public function bookingsAsPatient(): HasMany
     {
-        return $this->hasMany(PillDispense::class, 'patient_id');
-    }
-
-    public function pillDispensesAsStaff(): HasMany
-    {
-        return $this->hasMany(PillDispense::class, 'staff_id');
+        return $this->hasMany(Booking::class, 'user_id');
     }
 
     public function isPatient(): bool

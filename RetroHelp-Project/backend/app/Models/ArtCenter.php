@@ -3,12 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ArtCenter extends Model
 {
+    protected $table = 'art_centers';
+
     protected $fillable = [
         'name',
+        'nickname',
+        'role_id',
         'image',
         'latitude',
         'longitude',
@@ -30,13 +35,18 @@ class ArtCenter extends Model
         ];
     }
 
-    public function pillDispenses(): HasMany
+    public function role(): BelongsTo
     {
-        return $this->hasMany(PillDispense::class, 'art_center_id');
+        return $this->belongsTo(Role::class, 'role_id');
     }
 
     public function navigations(): HasMany
     {
         return $this->hasMany(Navigation::class, 'art_center_id');
+    }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(Booking::class, 'art_center_id');
     }
 }

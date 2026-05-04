@@ -12,7 +12,7 @@ trait BuildsSafeUserPayload
      */
     protected function safeUserPayload(User $user): array
     {
-        $user->loadMissing('role:id,role_name');
+        $user->loadMissing(['role:id,role_name', 'artCenter:id,name,nickname']);
 
         $payload = [
             'id' => $user->id,
@@ -31,6 +31,14 @@ trait BuildsSafeUserPayload
 
         $payload['nickname'] = $user->nickname;
         $payload['full_name'] = $user->full_name;
+        $payload['art_center_id'] = $user->art_center_id;
+        $payload['art_center'] = $user->artCenter !== null
+            ? [
+                'id' => $user->artCenter->id,
+                'name' => $user->artCenter->name,
+                'nickname' => $user->artCenter->nickname,
+            ]
+            : null;
 
         return $payload;
     }

@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { AboutPage } from './pages/AboutPage'
 import { CustomerSupportPage } from './pages/CustomerSupportPage'
@@ -7,7 +7,8 @@ import { FindClinicPage } from './pages/FindClinicPage'
 import { HomePage } from './pages/HomePage'
 import { LibraryPage } from './pages/LibraryPage'
 import { ProfilePage } from './pages/ProfilePage'
-import { StaffDispensesPage } from './pages/StaffDispensesPage'
+import { AdminDashboardPage } from './pages/AdminDashboardPage'
+import { StaffDashboardPage } from './pages/StaffDashboardPage'
 
 export default function App() {
   return (
@@ -20,7 +21,9 @@ export default function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/library" element={<LibraryPage />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/staff" element={<StaffDispensesPage />} />
+        <Route path="/staff" element={<StaffDashboardPage />} />
+        <Route path="/admin" element={<AdminDashboardPage />} />
+        <Route path="/admin/staff-approvals" element={<Navigate to="/admin" replace />} />
       </Route>
     </Routes>
   )

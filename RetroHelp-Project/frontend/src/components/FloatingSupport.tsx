@@ -1,11 +1,16 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { api, getApiErrorMessage } from '../api/client'
 import { useSupportOpener } from '../context/SupportOpenerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 
 type Tab = 'ai' | 'live'
 
-type ChatMessage = { id: string; role: 'user' | 'bot'; text: string }
+type ChatMessage = { id: string; role: 'user' | 'assistant'; text: string }
+
+function toApiMessages(rows: ChatMessage[]): { role: 'user' | 'assistant'; content: string }[] {
+  return rows.map((m) => ({ role: m.role, content: m.text }))
+}
 
 export function FloatingSupport() {
   const { lang, t } = useLanguage()
@@ -14,11 +19,14 @@ export function FloatingSupport() {
   const [tab, setTab] = useState<Tab>('ai')
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
 
   useEffect(() => {
     setMessages([
-      { id: `welcome-${lang}`, role: 'bot', text: t.support.botWelcome },
+      { id: `welcome-${lang}`, role: 'assistant', text: t.support.botWelcome },
     ])
+    setSendError(null)
   }, [lang, t])
 
   useEffect(() => {
@@ -30,24 +38,40 @@ export function FloatingSupport() {
     return () => registerOpen(null)
   }, [registerOpen])
 
-  const send = () => {
+  const send = async () => {
     const trimmed = input.trim()
-    if (!trimmed) return
+    if (!trimmed || sending) return
     setInput('')
-    setMessages((prev) => [
-      ...prev,
-      { id: crypto.randomUUID(), role: 'user', text: trimmed },
-    ])
-    window.setTimeout(() => {
+    setSendError(null)
+
+    const userMsg: ChatMessage = { id: crypto.randomUUID(), role: 'user', text: trimmed }
+    const nextThread = [...messages, userMsg]
+    setMessages(nextThread)
+    setSending(true)
+
+    try {
+      const { data } = await api.post<{ data: { message: string } }>('/api/support/chat', {
+        messages: toApiMessages(nextThread),
+      })
+      const reply = data?.data?.message?.trim()
+      if (!reply) {
+        setSendError(t.support.aiError)
+        return
+      }
       setMessages((prev) => [
         ...prev,
-        {
-          id: crypto.randomUUID(),
-          role: 'bot',
-          text: t.support.botReply,
-        },
+        { id: crypto.randomUUID(), role: 'assistant', text: reply },
       ])
-    }, 600)
+    } catch (err) {
+      const msg = getApiErrorMessage(err)
+      if (msg.includes('OPENAI_API_KEY') || msg.includes('not configured')) {
+        setSendError(t.support.aiUnavailable)
+      } else {
+        setSendError(msg || t.support.aiError)
+      }
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -149,6 +173,11 @@ export function FloatingSupport() {
                   <p className="border-b border-orange-50 px-4 py-2 text-xs leading-relaxed text-stone-500">
                     {t.support.aiHint}
                   </p>
+                  {sendError ? (
+                    <p className="border-b border-rose-100 bg-rose-50/90 px-3 py-2 text-xs text-rose-800">
+                      {sendError}
+                    </p>
+                  ) : null}
                   <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-3 py-3">
                     {messages.map((m, i) => (
                       <motion.div
@@ -165,7 +194,7 @@ export function FloatingSupport() {
                               : 'bg-stone-100 text-stone-800'
                           }`}
                         >
-                          {m.role === 'bot' && (
+                          {m.role === 'assistant' && (
                             <p className="mb-1 text-[10px] font-bold uppercase tracking-wide text-teal-700/90">
                               {t.support.botName}
                             </p>
@@ -174,21 +203,28 @@ export function FloatingSupport() {
                         </div>
                       </motion.div>
                     ))}
+                    {sending ? (
+                      <p className="text-center text-xs text-stone-500">{t.support.aiThinking}</p>
+                    ) : null}
                   </div>
                   <div className="flex gap-2 border-t border-orange-50 p-3">
                     <input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && send()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') void send()
+                      }}
+                      disabled={sending}
                       placeholder={t.support.aiPlaceholder}
-                      className="min-w-0 flex-1 rounded-2xl border border-orange-100 bg-stone-50 px-3 py-2.5 text-sm text-stone-900 outline-none ring-teal-500/30 placeholder:text-stone-400 focus:ring-2"
+                      className="min-w-0 flex-1 rounded-2xl border border-orange-100 bg-stone-50 px-3 py-2.5 text-sm text-stone-900 outline-none ring-teal-500/30 placeholder:text-stone-400 focus:ring-2 disabled:opacity-60"
                     />
                     <button
                       type="button"
-                      onClick={send}
-                      className="shrink-0 rounded-2xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-teal-900/20 transition hover:bg-teal-700"
+                      disabled={sending}
+                      onClick={() => void send()}
+                      className="shrink-0 rounded-2xl bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-md shadow-teal-900/20 transition hover:bg-teal-700 disabled:opacity-60"
                     >
-                      {t.support.send}
+                      {sending ? t.support.aiThinking : t.support.send}
                     </button>
                   </div>
                 </div>

@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 class ArtCenterController extends Controller
 {
     /**
-     * Top clinics for public home: ranked by pill handout success (Given + Received) and feedback scores.
+     * Top clinics for public home: ranked by booking-flow pill handouts (pill_given + completed),
+     * then average rating and review volume.
      */
     public function topRanked(Request $request): JsonResponse
     {
@@ -26,11 +27,11 @@ class ArtCenterController extends Controller
                 'art_centers.is_verified',
             ])
             ->withCount([
-                'pillDispenses as pill_success_count' => static function ($q): void {
-                    $q->whereIn('status', ['Given', 'Received']);
+                'bookings as booking_pill_given_count' => static function ($q): void {
+                    $q->whereIn('status', ['pill_given', 'completed']);
                 },
             ])
-            ->orderByDesc('pill_success_count')
+            ->orderByRaw('COALESCE(booking_pill_given_count, 0) DESC')
             ->orderByDesc('rating_avg')
             ->orderByDesc('total_reviews')
             ->orderBy('art_centers.name')
@@ -42,20 +43,24 @@ class ArtCenterController extends Controller
     }
 
     /**
-     * Privacy-first listing: filter by township and/or area only; omit direct contact and coordinates.
-     * Results are ranked by completed pill dispenses (status Received) at each center.
+     * Privacy-first listing: optional keyword search; omit direct contact and coordinates.
+     * Results are ranked by completed visit requests (bookings with status completed).
      */
     public function search(Request $request): JsonResponse
     {
         $filters = $request->validate([
-            'township' => ['nullable', 'string', 'max:255'],
-            'area' => ['nullable', 'string', 'max:255'],
+            'q' => ['nullable', 'string', 'max:255'],
+            'limit' => ['nullable', 'integer', 'min:1', 'max:500'],
         ]);
+
+        $q = isset($filters['q']) ? trim($filters['q']) : '';
+        $limit = min(max((int) ($filters['limit'] ?? 150), 1), 500);
 
         $query = ArtCenter::query()
             ->select([
                 'art_centers.id',
                 'art_centers.name',
+                'art_centers.nickname',
                 'art_centers.township',
                 'art_centers.area',
                 'art_centers.is_verified',
@@ -63,21 +68,24 @@ class ArtCenterController extends Controller
                 'art_centers.total_reviews',
             ])
             ->withCount([
-                'pillDispenses as completed_dispenses_count' => static function ($q): void {
-                    $q->where('status', 'Received');
+                'bookings as completed_bookings_count' => static function ($q): void {
+                    $q->where('status', 'completed');
                 },
             ]);
 
-        if (! empty($filters['township'])) {
-            $query->where('township', $filters['township']);
+        if ($q !== '') {
+            $like = '%'.addcslashes($q, '%_\\').'%';
+            $query->where(static function ($sub) use ($like): void {
+                $sub->where('art_centers.name', 'like', $like)
+                    ->orWhere('art_centers.township', 'like', $like)
+                    ->orWhere('art_centers.area', 'like', $like);
+            });
         }
 
-        if (! empty($filters['area'])) {
-            $query->where('area', $filters['area']);
-        }
-
-        $query->orderByDesc('completed_dispenses_count')
-            ->orderBy('art_centers.name');
+        $query->orderByRaw('COALESCE(completed_bookings_count, 0) DESC')
+            ->orderByDesc('rating_avg')
+            ->orderBy('art_centers.name')
+            ->limit($limit);
 
         return response()->json([
             'data' => $query->get(),

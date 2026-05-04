@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    /*
+    | OpenAI (customer support chat in app). Set OPENAI_API_KEY to enable.
+    | Optional: OPENAI_API_BASE for compatible proxies (default https://api.openai.com/v1).
+    */
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'api_base' => env('OPENAI_API_BASE', 'https://api.openai.com/v1'),
+        'chat_model' => env('OPENAI_CHAT_MODEL', 'gpt-4o-mini'),
+    ],
+
 ];

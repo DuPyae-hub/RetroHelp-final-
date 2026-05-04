@@ -4,16 +4,22 @@ import { useLanguage } from '../i18n/LanguageContext'
 export function BurmeseToggle({
   className = '',
   tone = 'light',
+  /** Unique per mount so Framer `layoutId` does not steal the pill between Navbar and Footer. */
+  pillLayoutId = 'lang-pill',
 }: {
   className?: string
   tone?: 'light' | 'dark'
+  pillLayoutId?: string
 }) {
   const { lang, setLang, t } = useLanguage()
   const shell =
     tone === 'dark'
       ? 'border-slate-600 bg-slate-800/90 shadow-none backdrop-blur-sm'
-      : 'border-teal-200/80 bg-white/90 shadow-sm shadow-teal-900/5 backdrop-blur-sm'
-  const inactive = tone === 'dark' ? 'text-slate-300 hover:text-white' : 'text-stone-600 hover:text-stone-900'
+      : 'border-teal-300/90 bg-white shadow-sm shadow-teal-900/10 backdrop-blur-sm'
+  const inactive =
+    tone === 'dark'
+      ? 'text-slate-200 hover:text-white'
+      : 'text-stone-800 hover:text-stone-950'
 
   return (
     <div
@@ -30,7 +36,7 @@ export function BurmeseToggle({
       >
         {lang === 'en' && (
           <motion.span
-            layoutId="lang-pill"
+            layoutId={pillLayoutId}
             className="absolute inset-0 rounded-full bg-teal-600"
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />
@@ -46,7 +52,7 @@ export function BurmeseToggle({
       >
         {lang === 'my' && (
           <motion.span
-            layoutId="lang-pill"
+            layoutId={pillLayoutId}
             className="absolute inset-0 rounded-full bg-teal-600"
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
           />

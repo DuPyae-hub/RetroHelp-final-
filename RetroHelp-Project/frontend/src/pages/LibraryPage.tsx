@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { api, getApiErrorMessage } from '../api/client'
+import { AnimatedLibraryMascot } from '../components/AnimatedSectionMascots'
+import { partitionResourceLibrary } from '../lib/resourceLibraryCategory'
 import { useLanguage } from '../i18n/LanguageContext'
 import type { TranslationTree } from '../i18n/translations'
 import type { ResourceLibraryItem } from '../types/api'
@@ -17,7 +19,9 @@ export function LibraryPage() {
         const { data } = await api.get<{ data: ResourceLibraryItem[] }>(
           '/api/resource-libraries',
         )
-        if (!cancelled) setItems(data.data)
+        if (!cancelled) {
+          setItems(Array.isArray(data?.data) ? data.data : [])
+        }
       } catch (e) {
         if (!cancelled) {
           setError(getApiErrorMessage(e))
@@ -30,29 +34,28 @@ export function LibraryPage() {
     }
   }, [])
 
-  const basics = useMemo(
-    () => items?.filter((i) => i.category === 'Basics') ?? [],
-    [items],
-  )
-  const care = useMemo(
-    () => items?.filter((i) => i.category === 'Care') ?? [],
+  const { basics, care, other } = useMemo(
+    () => partitionResourceLibrary(items ?? []),
     [items],
   )
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-10 max-w-2xl"
-      >
-        <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
-          {t.library.title}
-        </h1>
-        <p className="mt-3 text-base leading-relaxed text-stone-600 sm:text-lg">
-          {t.library.description}
-        </p>
-      </motion.div>
+      <div className="mb-10 flex flex-col items-start gap-6 sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-2xl"
+        >
+          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+            {t.library.title}
+          </h1>
+          <p className="mt-3 text-base leading-relaxed text-stone-600 sm:text-lg">
+            {t.library.description}
+          </p>
+        </motion.div>
+        <AnimatedLibraryMascot className="mx-auto h-32 w-32 sm:mx-0 sm:h-36 sm:w-36" />
+      </div>
 
       {error && (
         <p className="mb-6 rounded-2xl border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-rose-800">
@@ -60,7 +63,7 @@ export function LibraryPage() {
         </p>
       )}
 
-      {items === null ? (
+      {items == null ? (
         <p className="rounded-3xl border border-orange-100 bg-white px-6 py-10 text-center text-stone-600">
           {t.library.loading}
         </p>
@@ -98,6 +101,18 @@ export function LibraryPage() {
               </ul>
             )}
           </section>
+          {other.length > 0 ? (
+            <section>
+              <h2 className="mb-5 text-xl font-bold text-teal-900 sm:text-2xl">
+                {t.library.other}
+              </h2>
+              <ul className="grid gap-5 sm:grid-cols-2">
+                {other.map((item, i) => (
+                  <ResourceCard key={item.id} item={item} index={i} t={t} />
+                ))}
+              </ul>
+            </section>
+          ) : null}
         </div>
       )}
     </div>

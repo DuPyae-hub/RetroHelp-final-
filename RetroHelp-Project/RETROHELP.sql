@@ -88,14 +88,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (1, '2026_03_20_000001_create_roles_table', 1),
 (2, '2026_03_20_000002_create_users_table', 1),
 (3, '2026_03_20_000003_create_art_centers_table', 1),
-(4, '2026_03_20_000004_create_pill_dispenses_table', 1),
 (5, '2026_03_20_000005_create_resource_libraries_table', 1),
 (6, '2026_03_20_000006_create_contact_messages_table', 1),
 (7, '2026_03_20_000007_create_navigations_table', 1),
 (8, '2019_12_14_000001_create_personal_access_tokens_table', 2),
 (9, '2026_03_20_000008_add_township_area_to_art_centers', 3),
 (10, '2026_03_20_000009_add_art_center_to_navigations', 3),
-(11, '2026_03_20_000010_add_art_center_and_navigation_to_pill_dispenses', 4),
 (12, '2026_03_20_100000_drop_singular_tables', 4);
 
 -- --------------------------------------------------------
@@ -160,31 +158,6 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (13, 'App\\Models\\User', 9, 'api-token', '06e7d5e408a9bcbaf6cba274822ad1dd50a5e831fbfb1be5667c8a3301a4c3cd', '[\"*\"]', '2026-03-20 05:23:21', NULL, '2026-03-20 05:23:15', '2026-03-20 05:23:21'),
 (14, 'App\\Models\\User', 10, 'api-token', '489343e64fb71a70294d192d5462d34915825f097a349fc0fc5d57ba9cc16b18', '[\"*\"]', '2026-03-20 05:23:21', NULL, '2026-03-20 05:23:16', '2026-03-20 05:23:21'),
 (15, 'App\\Models\\User', 11, 'api-token', '6a956fd5e82b2e93e1b8722f3c183cecfa17a76b201a2b0502502fd5db8c1ce7', '[\"*\"]', '2026-03-20 05:23:21', NULL, '2026-03-20 05:23:16', '2026-03-20 05:23:21');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `pill_dispenses`
---
-
-CREATE TABLE `pill_dispenses` (
-  `dispense_id` bigint(20) UNSIGNED NOT NULL,
-  `patient_id` bigint(20) UNSIGNED NOT NULL,
-  `staff_id` bigint(20) UNSIGNED NOT NULL,
-  `status` enum('Pending','Received','Given') NOT NULL DEFAULT 'Pending',
-  `dispense_date` datetime DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `art_center_id` bigint(20) UNSIGNED DEFAULT NULL,
-  `navigation_id` bigint(20) UNSIGNED DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `pill_dispenses`
---
-
-INSERT INTO `pill_dispenses` (`dispense_id`, `patient_id`, `staff_id`, `status`, `dispense_date`, `created_at`, `updated_at`, `art_center_id`, `navigation_id`) VALUES
-(1, 9, 10, 'Given', '2026-03-20 11:40:04', '2026-03-20 05:09:48', '2026-03-20 05:10:04', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -322,16 +295,6 @@ ALTER TABLE `personal_access_tokens`
   ADD KEY `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`,`tokenable_id`);
 
 --
--- Indexes for table `pill_dispenses`
---
-ALTER TABLE `pill_dispenses`
-  ADD PRIMARY KEY (`dispense_id`),
-  ADD KEY `pill_dispenses_patient_id_foreign` (`patient_id`),
-  ADD KEY `pill_dispenses_staff_id_foreign` (`staff_id`),
-  ADD KEY `pill_dispenses_art_center_id_foreign` (`art_center_id`),
-  ADD KEY `pill_dispenses_navigation_id_foreign` (`navigation_id`);
-
---
 -- Indexes for table `resource_libraries`
 --
 ALTER TABLE `resource_libraries`
@@ -394,12 +357,6 @@ ALTER TABLE `personal_access_tokens`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
--- AUTO_INCREMENT for table `pill_dispenses`
---
-ALTER TABLE `pill_dispenses`
-  MODIFY `dispense_id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
 -- AUTO_INCREMENT for table `resource_libraries`
 --
 ALTER TABLE `resource_libraries`
@@ -439,15 +396,6 @@ ALTER TABLE `contact_messages`
 ALTER TABLE `navigations`
   ADD CONSTRAINT `navigations_art_center_id_foreign` FOREIGN KEY (`art_center_id`) REFERENCES `art_centers` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `navigations_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
-
---
--- Constraints for table `pill_dispenses`
---
-ALTER TABLE `pill_dispenses`
-  ADD CONSTRAINT `pill_dispenses_art_center_id_foreign` FOREIGN KEY (`art_center_id`) REFERENCES `art_centers` (`id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `pill_dispenses_navigation_id_foreign` FOREIGN KEY (`navigation_id`) REFERENCES `navigations` (`navigation_id`) ON DELETE SET NULL,
-  ADD CONSTRAINT `pill_dispenses_patient_id_foreign` FOREIGN KEY (`patient_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `pill_dispenses_staff_id_foreign` FOREIGN KEY (`staff_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `reviews`

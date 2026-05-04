@@ -11,3 +11,7 @@ export function isCommunityMember(roleId: number | undefined): boolean {
 export function isStaffOrAdmin(roleId: number | undefined): boolean {
   return roleId === ROLE.clinicStaff || roleId === ROLE.admin
 }
+
+export function isAdmin(roleId: number | undefined): boolean {
+  return roleId === ROLE.admin
+}

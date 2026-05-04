@@ -10,6 +10,27 @@ use Illuminate\Http\Request;
 class NavigationController extends Controller
 {
     /**
+     * Community member: list own saved navigation / visit plans (newest first).
+     */
+    public function index(Request $request): JsonResponse
+    {
+        $rows = Navigation::query()
+            ->where('user_id', $request->user()->id)
+            ->with(['artCenter:id,name,township,area'])
+            ->orderByDesc('created_at')
+            ->limit(100)
+            ->get([
+                'navigation_id',
+                'start_location',
+                'destination',
+                'art_center_id',
+                'created_at',
+            ]);
+
+        return response()->json(['data' => $rows]);
+    }
+
+    /**
      * Record a community member’s intent to visit an ART center (navigation event).
      */
     public function store(Request $request): JsonResponse

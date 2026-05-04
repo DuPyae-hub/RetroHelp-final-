@@ -15,18 +15,19 @@ export type TopRankedClinic = {
   rating_avg: string | number | null
   total_reviews: number | null
   is_verified: boolean
-  pill_success_count?: number
+  booking_pill_given_count?: number
 }
 
 export type ArtCenterSearchItem = {
   id: number
   name: string
+  nickname?: string | null
   township: string | null
   area: string | null
   is_verified: boolean
   rating_avg: string | number | null
   total_reviews: number | null
-  completed_dispenses_count?: number
+  completed_bookings_count?: number
 }
 
 export type ArtCenterDetail = {
@@ -39,17 +40,40 @@ export type ArtCenterDetail = {
   is_verified: boolean
 }
 
-export type PendingDispenseItem = {
-  dispense_id: number
-  status: string
+export type NavigationLogItem = {
+  navigation_id: number
+  start_location: string | null
+  destination: string | null
+  art_center_id: number | null
   created_at: string | null
-  community_member_display: string
-  art_center_name: string | null
+  art_center?: {
+    id: number
+    name: string
+    township: string | null
+    area: string | null
+  } | null
 }
 
-export type AwaitingReceiptItem = {
-  dispense_id: number
+export type PatientBookingRow = {
+  id: number
+  user_id: number
+  art_center_id: number
+  staff_id: number | null
+  navigation_id: number | null
   status: string
-  dispense_date: string | null
-  art_center_name: string | null
+  patient_note: string | null
+  accepted_at: string | null
+  respond_by_at: string | null
+  cancelled_at: string | null
+  cancellation_reason: string | null
+  created_at: string | null
+  updated_at: string | null
+  art_center?: {
+    id: number
+    name: string
+    township: string | null
+    area: string | null
+    latitude?: string | number | null
+    longitude?: string | number | null
+  } | null
 }

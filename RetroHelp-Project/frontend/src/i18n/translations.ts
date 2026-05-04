@@ -8,9 +8,12 @@ export const translations = {
       findClinic: 'Find Clinic',
       library: 'Library',
       profile: 'Profile',
-      staff: 'Staff desk',
+      profileSignedInAs: 'Signed in as',
+      staff: 'Staff dashboard',
+      adminDashboard: 'Admin',
       openMenu: 'Open menu',
       closeMenu: 'Close menu',
+      signIn: 'Sign in',
     },
     home: {
       eyebrow: 'Care that meets you where you are',
@@ -32,7 +35,7 @@ export const translations = {
         'We use neutral, non-judgmental language throughout so you feel respected, not labelled.',
       topClinicsTitle: 'Top-ranked clinics',
       topClinicsSub:
-        'Sorted using pill handout success (Given and Received) together with star ratings from community feedback.',
+        'Sorted using completed visit requests from the app together with star ratings from community feedback.',
       viewDirections: 'View directions',
       clinicsLoading: 'Loading clinics…',
       clinicsEmpty: 'No clinics to show yet.',
@@ -48,23 +51,37 @@ export const translations = {
     findClinic: {
       title: 'Find a clinic',
       description:
-        'Search by township and area. Listings are ranked by completed visits from community members—without exposing personal details.',
-      township: 'Township',
-      area: 'Area',
-      townshipPh: 'e.g. Yangon',
-      areaPh: 'e.g. Downtown',
+        'Search by keyword (name, township, or area text in the listing). Listings are ranked by completed visits from community members—without exposing personal details.',
       submit: 'Search clinics',
+      clinicsHeading: 'Clinics in the directory',
+      clinicsSub:
+        'We load centres here automatically. Enter a keyword and tap Search, or browse the full list.',
+      searchKeyword: 'Keyword (clinic name or place)',
+      searchKeywordPh: 'Type part of a name or place…',
       loading: 'Searching…',
-      empty: 'No clinics match those filters yet. Try another township or area.',
+      empty: 'No clinics match that keyword yet. Try another search or clear the box to see all.',
       verified: 'Verified',
       visitsLabel: 'Completed visits',
       viewMap: 'Map & visit',
       mapSignInHint:
-        'Sign in on your Profile with your nickname to open the map and optionally save this visit to your private history.',
+        'Sign in on your Profile with your nickname to open the map, request a pill pick-up for the clinic to see, or save a private route plan to your visit log.',
       mapTitle: 'Center location',
       noCoords:
         'This listing has no map coordinates yet. You can still record your visit for your records.',
-      recordVisit: 'Save visit to my records',
+      directionsIntro: 'Turn-by-turn directions in your maps app:',
+      openGoogleMaps: 'Open in Google Maps',
+      openAppleMaps: 'Open in Apple Maps',
+      actionsIntro:
+        'Request a real clinic visit for pill pick-up, or save a private route plan (clinic is not notified):',
+      requestPillVisit: 'Request pill pick-up',
+      requestPillVisitHelp:
+        'The clinic can accept this and track your visit until you confirm it is finished.',
+      requestingBooking: 'Sending request…',
+      bookingRequested:
+        'Request sent. Open Profile → My request sessions to see Pending / Approved and your next steps.',
+      recordVisit: 'Save route plan (private only)',
+      recordVisitHelp:
+        'Adds an entry to your private visit log on Profile only—does not notify the clinic.',
       recording: 'Saving…',
       visitSaved: 'Visit saved privately.',
       recordError: 'Could not save. Please try again.',
@@ -73,21 +90,114 @@ export const translations = {
     library: {
       title: 'Resource library',
       description:
-        'Trusted basics and care tips. Content is for education only—always follow your care team’s guidance.',
+        'Trusted basics and care tips. Content is for education only—always follow your care team’s guidance. Rows in phpMyAdmin should use category Basics or Care (any letter case); other categories appear under More topics.',
       basics: 'Basics',
       care: 'Care',
+      other: 'More topics',
       loading: 'Loading articles…',
       emptyBasics: 'No basics articles yet.',
       emptyCare: 'No care articles yet.',
+      emptyOther: 'No additional articles.',
       readTime: 'Read',
+    },
+    admin: {
+      pendingTitle: 'Pending clinic staff',
+      pendingDescription:
+        'New clinic staff registrations appear here. Approve only people you recognize from your organization.',
+      empty: 'No clinic staff are waiting for approval.',
+      loading: 'Loading…',
+      forbidden: 'You need an administrator account to view this page.',
+      approveBtn: 'Approve',
+      approving: 'Approving…',
+      approveSuccess: 'Staff member approved. They can now sign in on the Staff tab.',
+    },
+    adminDash: {
+      title: 'Administrator dashboard',
+      subtitle:
+        'Review platform activity, approve clinic staff accounts, and verify new ART center listings before they are treated as fully trusted in the directory.',
+      tabs: {
+        overview: 'Overview',
+        staff: 'Pending staff',
+        clinics: 'Pending clinics',
+      },
+      cardUsers: 'Accounts',
+      cardCentersBookings: 'Directory & visits',
+      labelPatients: 'Community members',
+      labelStaff: 'Clinic staff',
+      labelAdmins: 'Administrators',
+      labelPendingStaff: 'Staff awaiting approval',
+      labelCenters: 'ART centers listed',
+      labelPendingCenters: 'Centers awaiting verification',
+      labelBookings: 'Visit requests (all time)',
+      bookingsByStatus: 'Bookings by status',
+      overviewHint:
+        'Numbers update when you load this tab. Use the other tabs to take action on pending items.',
+      overviewEmpty: 'Could not load overview.',
+      clinicsTitle: 'Unverified clinic listings',
+      clinicsDescription:
+        'Staff sometimes register a clinic that is not in the directory yet. Verify each listing once you have confirmed it with your partners.',
+      clinicsEmpty: 'No clinics are waiting for verification.',
+      centerNickname: 'Login nickname',
+      centerContact: 'Contact',
+      verifyCenterBtn: 'Mark verified',
+      verifyCenterOk: 'Listing verified. It can now appear as verified where supported.',
+      approveStaffOk: 'Staff member approved.',
+    },
+    staffDash: {
+      title: 'Staff dashboard',
+      subtitle:
+        'Handle visit requests for your clinic, publish library articles, and review how centers rank across the network.',
+      tabs: {
+        bookings: 'Visit requests',
+        article: 'New article',
+        rankings: 'Center rankings',
+      },
+      tabLegend:
+        'Member pill pick-up requests from Find Clinic appear under Visit requests. Use the other tabs for library publishing and rankings.',
+      statusFilter: 'Filter by status',
+      statusAll: 'All statuses',
+      adminCenterFilter: 'Clinic (admins)',
+      adminAllCenters: 'All clinics',
+      refresh: 'Refresh list',
+      bookingsNeedCenter:
+        'Your account is not linked to a clinic yet, so visit requests cannot be listed. Ask an administrator to link your profile to the correct ART center.',
+      bookingsLinkedClinicPrefix: 'You are viewing visit requests for',
+      bookingsLinkedClinicSuffix:
+        'Only members who chose this same center on Find Clinic appear here.',
+      bookingsEmpty: 'No visit requests match this view.',
+      bookingsEmptyStaffHint:
+        'If a member already sent a request but you still see nothing, they may have picked a different ART center than the one linked to your staff account. Ask an administrator to confirm your user row art_center_id matches that clinic, or sign out and sign in again on the Staff tab after picking the correct clinic.',
+      bookingsLinkedIdLabel: 'Linked clinic ID (give this to your admin when fixing your account)',
+      bookingsEmptyActionsIntro: 'You can still use other parts of this dashboard:',
+      bookingsEmptyGoRankings: 'Open Center rankings',
+      bookingsEmptyGoArticle: 'Publish a library article',
+      bookingPatient: 'Member',
+      bookingStatus: 'Status',
+      note: 'Note from member',
+      accept: 'Accept request',
+      pillGiven: 'Record pill given',
+      cancelBooking: 'Cancel visit',
+      articleHeading: 'Publish to the resource library',
+      articleHint:
+        'Use clear titles and neutral language. Choose Basics or Care when possible so articles appear in the right section on the Library page.',
+      articleTitle: 'Title',
+      articleCategory: 'Category',
+      articleBody: 'Content (optional)',
+      articleSubmit: 'Publish article',
+      articleSuccess: 'Article published. It is visible on the Library page.',
+      rankClinic: 'Clinic',
+      rankTownship: 'Location',
+      rankScore: 'Visit-flow score',
+      rankFootnote:
+        'Score counts booking visits where the pill step is done or the visit is completed, then ratings—same ordering as the public home page.',
     },
     profile: {
       title: 'Your profile',
       description:
-        'This space is for community members. You deserve dignity, privacy, and support—never labels that define you.',
+        'Sign in or create an account. Community members use a confidential nickname; clinic staff register with their full name and need administrator approval before they can sign in.',
       cardTitle: 'Community Member',
       cardBody:
-        'Account tools and history will appear here as we connect this area to the RetroHelp API.',
+        'After you sign in, your pill visit requests and private visit log appear below.',
       privacyNote:
         'In production, traffic uses HTTPS. Your access credential stays in this browser only until you sign out. Community members are identified by nickname only—not legal names.',
       tabSignIn: 'Sign in',
@@ -95,6 +205,31 @@ export const translations = {
       tabStaff: 'Staff',
       registerIntro:
         'Create a confidential account with a unique nickname and a strong password (at least 8 characters).',
+      registerAccountType: 'I am registering as',
+      registerAsPatient: 'Community member',
+      registerAsStaff: 'Clinic staff',
+      staffRegisterIntro:
+        'Use the full name your clinic recognizes. You will not be able to sign in until an administrator approves your account.',
+      staffOptionalNickname: 'Display nickname (optional)',
+      staffOptionalNicknameHelp:
+        'If you add one, it must be unique and is stored like other users’ nicknames. Sign-in still uses your full name.',
+      staffClinicSelectLabel: 'Your clinic (directory)',
+      staffClinicSelectPh: 'Select the ART center you work at…',
+      staffRegisterNewListing: 'My clinic is not listed — register a new listing',
+      staffNewCenterIntro:
+        'Required for a new listing: clinic name, township, area, and contact number. Optional: image URL, map coordinates. An administrator can verify the center later.',
+      newCenterName: 'Clinic name',
+      newCenterTownship: 'Township',
+      newCenterArea: 'Area / neighborhood',
+      newCenterContact: 'Contact number',
+      newCenterImageOptional: 'Image URL (optional)',
+      newCenterLatOptional: 'Latitude (optional)',
+      newCenterLngOptional: 'Longitude (optional)',
+      staffClinicRequired: 'Choose your clinic or switch to “not listed” and complete the new listing fields.',
+      staffLoginClinicLabel: 'Clinic for sign-in',
+      staffLoginClinicPh: 'Select the same clinic you registered with',
+      staffPendingBanner:
+        'Thank you. Your registration is saved. Please wait for administrator approval, then sign in on the Staff tab.',
       passwordConfirm: 'Confirm password',
       registerSubmit: 'Create account',
       nicknameLabel: 'Nickname (confidential)',
@@ -106,30 +241,82 @@ export const translations = {
       saveNickname: 'Save nickname',
       saving: 'Saving…',
       loggedInAs: 'Signed in',
+      loggedInClinic: 'Linked clinic',
       logout: 'Sign out',
       staffHint: 'Staff sign-in uses your registered full name.',
+      adminSignInToggle: 'Administrator sign-in',
+      adminSignInHelp:
+        'Turn this on for a platform administrator only. You will not pick a clinic. Use the administrator full name and password from your server (see callout below).',
+      adminCalloutTitle: 'Administrator credentials come from the server',
+      adminCalloutBody:
+        'Typical setup: in backend/.env set RETROHELP_ADMIN_FULL_NAME (default RetroHelp Admin) and RETROHELP_ADMIN_PASSWORD, then run php artisan db:seed --class=AdminUserSeeder. For admins created in the database, you may type either full name or nickname (if full name is empty)—not a community member nickname. This is not the same as clinic staff sign-in.',
+      adminFullNameLabel: 'Administrator full name or nickname',
+      adminFullNamePlaceholder: 'e.g. RetroHelp Admin',
+      adminFullNameHint:
+        'Must match the administrator’s full_name or nickname in the database (trimmed; case-insensitive). Seeded admins use RETROHELP_ADMIN_FULL_NAME.',
+      adminPasswordLabel: 'Administrator password',
+      adminPasswordHint: 'Must match RETROHELP_ADMIN_PASSWORD in backend/.env (after seeding).',
+      loginAdmin: 'Sign in as administrator',
       nicknameSaved: 'Nickname updated.',
+      recordsTitle: 'Your care activity',
+      recordsIntro:
+        'Visible only while you are signed in on this browser. Use Find Clinic to start a new request or private log entry.',
+      visitLogTitle: 'Private visit log',
+      visitLogHelp:
+        'Entries from “Save route plan (private only)”. The clinic does not see this list.',
+      visitLogEmpty:
+        'Nothing here yet. On Find Clinic, open a center’s map and save a private route plan if you want your own record.',
+      bookingsTitle: 'My request sessions',
+      bookingsHelp:
+        'Each request shows progress: Pending until the clinic approves, then Approved. After approval you must choose I’m coming before the deadline or the request cancels automatically—even if it was already approved.',
+      bookingsEmpty: 'You have not sent a pill visit request yet.',
+      bookingsViewFindClinic: 'Find Clinic',
+      bookingsActiveHeading: 'In progress',
+      bookingsClosedHeading: 'Past sessions',
+      bookingAt: 'Clinic',
+      bookingRequestedOn: 'Requested',
+      bookingWaitClinic: 'Pending — waiting for the clinic to approve.',
+      bookingWaitPill: 'Waiting for staff to record pill given.',
+      bookingDone: 'Visit closed. Thank you.',
+      bookingProgressLabel: 'Progress',
+      respondByIntro:
+        'Clinic approved this visit. Tap I’m coming before this time (your device’s local time) or the request will cancel:',
+      respondByUnknown: 'Deadline not set — refresh the page.',
+      respondByTimeLeftPrefix: 'Time remaining:',
+      bookingActionOnMyWay: 'I’m coming — start trip',
+      bookingActionArrived: 'I’ve arrived',
+      bookingActionComplete: 'Mark visit complete',
+      bookingActionWorking: 'Updating…',
+      bookingActionCancel: 'Cancel request',
+      bookingCancelConfirm:
+        'Cancel this visit request? You can send a new one from Find Clinic later.',
+      cancellationByPatient: 'You cancelled this request.',
+      cancellationByClinic: 'The clinic cancelled this request.',
+      bookingCompleteNote:
+        'After “pill given”, tap complete here. You can add a star rating when completing from a fuller flow later.',
+      cancellationNoComing:
+        'Cancelled — you did not confirm you were coming before the deadline.',
+      bookingStatus: {
+        requested: 'Pending',
+        accepted: 'Approved',
+        on_my_way: 'On my way',
+        arrived: 'At clinic — waiting for pill',
+        pill_given: 'Pill given — confirm to finish',
+        completed: 'Completed',
+        cancelled: 'Cancelled',
+      },
+      bookingSteps: {
+        pending: 'Pending',
+        approved: 'Approved',
+        coming: 'Coming',
+        arrived: 'Arrived',
+        pill: 'Pill',
+        done: 'Done',
+      },
     },
     staff: {
-      title: 'Pending medication handouts',
-      description:
-        'Community members are shown by nickname only. Mark as Given when you physically hand over medication.',
-      empty: 'No pending handouts right now.',
-      markGiven: 'Mark as Given',
       working: 'Updating…',
       at: 'Center',
-      member: 'Community member',
-    },
-    receipt: {
-      title: 'Confirm receipt',
-      subtitle:
-        'Your clinic marked medication as given. Confirm here when you have received it.',
-      at: 'Location',
-      when: 'Handed out',
-      confirm: 'Confirm receipt',
-      busy: 'Confirming…',
-      done: 'Thank you—your record is updated.',
-      none: 'Nothing waiting for confirmation.',
     },
     footer: {
       quickLinks: 'Quick links',
@@ -169,6 +356,9 @@ export const translations = {
         'Hello. I am here to listen and point you to general information. What would you like to know?',
       botReply:
         'Thank you for sharing that. I am a demo assistant and cannot give medical guidance. Please reach out to your clinic or trusted professional for personal care decisions. You can also browse the Library for educational articles.',
+      aiThinking: 'Thinking…',
+      aiError: 'Could not get a reply. Please try again.',
+      aiUnavailable: 'AI support is not enabled on the server yet. Ask your administrator to set OPENAI_API_KEY.',
     },
     lang: {
       english: 'English',
@@ -183,9 +373,12 @@ export const translations = {
       findClinic: 'ဆေးခန်းရှာရန်',
       library: 'လေ့လာရေးစာကြည့်တိုက်',
       profile: 'ကိုယ်ရေးအချက်အလက်',
-      staff: 'စာရေးမှူးကွက်',
+      profileSignedInAs: 'ဝင်ရောက်ထားသူ',
+      staff: 'ဝန်ထမ်းဒက်ရှ်ဘုတ်',
+      adminDashboard: 'စီမံခန့်ခွဲသူ',
       openMenu: 'မီနူးဖွင့်ရန်',
       closeMenu: 'မီနူးပိတ်ရန်',
+      signIn: 'ဝင်ရောက်ရန်',
     },
     home: {
       eyebrow: 'သင့်နေရာမှ စတင်သည့် စောင့်ရှောက်မှု',
@@ -207,7 +400,7 @@ export const translations = {
         'ဝက်ဘ်ဆိုက်တစ်လျှောက်လုံးတွင် လေးစားမှု၊ အပြစ်မတင်သော ဘာသာစကားများကိုသာ သုံးပါသည်။',
       topClinicsTitle: 'အဆင့်အမြင့်ဆုံး ဆေးခန်းများ',
       topClinicsSub:
-        'ဆေးပေးမှုအောင်မြင်မှု (ပေးပြီး/လက်ခံမှု) နှင့် ကြယ်ပွင့်အကြံပြုချက်များဖြင့် စီပါသည်။',
+        'အက်ပ်မှ ပြီးစီးသော လည်ပတ်မှု တောင်းဆိုမှုများနှင့် ကြယ်ပွင့်အကြံပြုချက်များဖြင့် စီပါသည်။',
       viewDirections: 'လမ်းညွှန်ကြည့်ရန်',
       clinicsLoading: 'ဆေးခန်းများ ဖတ်နေသည်…',
       clinicsEmpty: 'ပြသရန် ဆေးခန်းမရှိသေးပါ။',
@@ -223,24 +416,38 @@ export const translations = {
     findClinic: {
       title: 'ဆေးခန်းရှာရန်',
       description:
-        'မြို့နယ်နှင့် နယ်မြေအလိုက် ရှာဖွေပါ။ အဖွဲ့ဝင်များ၏ ပြီးမြောက်သော လည်ပတ်မှုအရေအတွက်အရ စာရင်းပြုလုပ်ထားပြီး ကိုယ်ရေးကိုယ်တာအချက်အလက်များကို ထုတ်ဖော်ခြင်းမရှိပါ။',
-      township: 'မြို့နယ်',
-      area: 'နယ်မြေ',
-      townshipPh: 'ဥပမာ ရန်ကုန်',
-      areaPh: 'ဥပမာ လမ်းမတော်',
+        'စာလုံးဖြင့် ရှာဖွေနိုင်ပါသည် (အမည်၊ စာရင်းထဲက မြို့နယ် သို့မဟုတ် နယ်မြေစာသား)။ အဖွဲ့ဝင်များ၏ ပြီးမြောက်သော လည်ပတ်မှုအရ စာရင်းပြုလုပ်ထားပြီး ကိုယ်ရေးကိုယ်တာကို မထုတ်ဖော်ပါ။',
       submit: 'ဆေးခန်းရှာရန်',
+      clinicsHeading: 'စာရင်းတွင်ပါသော ဆေးခန်းများ',
+      clinicsSub:
+        'ဤနေရာတွင် စင်တာများကို အလိုအလျောက် ဖော်ပြပါသည်။ စာလုံး ရိုက်ပြီး ရှာဖွေပါ သို့မဟုတ် စာရင်းအားလုံးကို ကြည့်ရှုပါ။',
+      searchKeyword: 'စာလုံး (ဆေးခန်းအမည် သို့မဟုတ် နေရာ)',
+      searchKeywordPh: 'အမည် သို့မဟုတ် နေရာအစိတ်အပိုင်း ရိုက်ပါ…',
       loading: 'ရှာဖွေနေသည်…',
       empty:
-        'ရွေးချယ်ထားသော စစ်ထုတ်ချက်များနှင့် ကိုက်ညီသော ဆေးခန်းမရှိသေးပါ။ အခြားမြို့နယ် သို့မဟုတ် နယ်မြေဖြင့် စမ်းကြည့်ပါ။',
+        'ဤစာလုံးနှင့် ကိုက်ညီသော ဆေးခန်းမရှိသေးပါ။ အခြားစာလုံး စမ်းပါ သို့မဟုတ် အကွက်ကို ရှင်းပြီး စာရင်းအားလုံး ကြည့်ပါ။',
       verified: 'အတည်ပြုပြီး',
       visitsLabel: 'ပြီးမြောက်သော လည်ပတ်မှုများ',
       viewMap: 'မြေပုံနှင့် လည်ပတ်မှု',
       mapSignInHint:
-        'မြေပုံကိုဖွင့်ပြီး မှတ်တမ်းတင်ရန် ကိုယ်ရေးအချက်အလက်တွင် အမည်ပြောင်ဖြင့် ဝင်ရောက်ပါ။',
+        'မြေပုံကိုဖွင့်ရန်၊ ဆေးခန်းသိသော တောင်းဆိုမှုပို့ရန် သို့မဟုတ် ကိုယ်ပိုင် လည်ပတ်မှတ်တမ်းသိမ်းရန် ကိုယ်ရေးအချက်အလက်တွင် အမည်ပြောင်ဖြင့် ဝင်ရောက်ပါ။',
       mapTitle: 'စင်တာနေရာ',
       noCoords:
         'ဤစာရင်းတွင် မြေပုံကိုဩဒိနိတ်မရှိသေးပါ။ မှတ်တမ်းတင်ခြင်းကို ဆက်လုပ်နိုင်ပါသည်။',
-      recordVisit: 'ကျွန်ုပ်၏ မှတ်တမ်းသို့ သိမ်းရန်',
+      directionsIntro: 'မြေပုံအက်ပ်တွင် လမ်းညွှန်ချက်များ ဖွင့်ရန်။',
+      openGoogleMaps: 'Google Maps တွင် ဖွင့်ရန်',
+      openAppleMaps: 'Apple Maps တွင် ဖွင့်ရန်',
+      actionsIntro:
+        'ဆေးခန်းသို့ လာရောက်မည့် တောင်းဆိုမှု ပို့ရန် သို့မဟုတ် ကိုယ်ပိုင် လမ်းကြောင်း မှတ်တမ်းသာ သိမ်းရန် (ဆေးခန်းကို အကြောင်းမကြားပါ)။',
+      requestPillVisit: 'ဆေးယူရန် လာရောက်မှု တောင်းဆိုရန်',
+      requestPillVisitHelp:
+        'ဆေးခန်းက လက်ခံပြီး လည်ပတ်မှုကို ခြေရာခံနိုင်ပြီး သင်ပြီးမြောက်ကြောင်း အတည်ပြုသည့်အထိ ဆက်လုပ်နိုင်ပါသည်။',
+      requestingBooking: 'တောင်းဆိုမှု ပို့နေသည်…',
+      bookingRequested:
+        'တောင်းဆိုမှု ပို့ပြီးပါပြီ။ ကိုယ်ရေးအချက်အလက် → ကျွန်ုပ်၏ တောင်းဆိုမှု စက်ရှင်များတွင် စောင့်ဆိုင်း/အတည်ပြု အခြေအနေနှင့် နောက်တစ်ဆင့်များကို ကြည့်ပါ။',
+      recordVisit: 'ကိုယ်ပိုင် လမ်းကြောင်း သိမ်းရန် (ဆေးခန်းမသိ)',
+      recordVisitHelp:
+        'ကိုယ်ရေးအချက်အလက်ရှိ ကိုယ်ပိုင် လည်ပတ်မှတ်တမ်းသာထည့်သည်—ဆေးခန်းကို အကြောင်းမကြားပါ။',
       recording: 'သိမ်းနေသည်…',
       visitSaved: 'လျှို့ဝှက်စွာ သိမ်းပြီးပါပြီ။',
       recordError: 'သိမ်းမရပါ။ ထပ်စမ်းပါ။',
@@ -249,21 +456,114 @@ export const translations = {
     library: {
       title: 'လေ့လာရေးစာကြည့်တိုက်',
       description:
-        'ယုံကြည်စိတ်ချရသော အခြေခံဗဟုသုတနှင့် စောင့်ရှောက်မှု အကြံပြုချက်များ။ ပညာရေးအတွက်သာ—သင့်စောင့်ရှောက်ရေးအဖွဲ့၏ လမ်းညွှန်ချက်များကို အမြဲလိုက်နာပါ။',
+        'ယုံကြည်စိတ်ချရသော အခြေခံဗဟုသုတနှင့် စောင့်ရှောက်မှု အကြံပြုချက်များ။ ပညာရေးအတွက်သာ—သင့်စောင့်ရှောက်ရေးအဖွဲ့၏ လမ်းညွှန်ချက်များကို အမြဲလိုက်နာပါ။ phpMyAdmin တွင် category အက္ခရာအမျိုးအစား မတူညီစေဘဲ Basics သို့မဟုတ် Care ဟု ထည့်ပါ။ အခြားအမျိုးအစားများကို နောက်ထပ် ခေါင်းစဉ်အောက်တွင် ပြပါသည်။',
       basics: 'အခြေခံဗဟုသုတ',
       care: 'စောင့်ရှောက်မှု',
+      other: 'နောက်ထပ် ခေါင်းစဉ်များ',
       loading: 'ဆောင်းပါးများ ဖတ်နေသည်…',
       emptyBasics: 'အခြေခံဗဟုသုတ ဆောင်းပါးများ မရှိသေးပါ။',
       emptyCare: 'စောင့်ရှောက်မှု ဆောင်းပါးများ မရှိသေးပါ။',
+      emptyOther: 'နောက်ထပ် ဆောင်းပါးများ မရှိသေးပါ။',
       readTime: 'ဖတ်ရှု',
+    },
+    admin: {
+      pendingTitle: 'အတည်မပြုရသေးသော ဆေးခန်းဝန်ထမ်းများ',
+      pendingDescription:
+        'ဆေးခန်းဝန်ထမ်း အကောင့်အသစ်များ ဤနေရာတွင် ပေါ်လာပါသည်။ အဖွဲ့အတွင်းမှ သိရှိရသူများကိုသာ အတည်ပြုပါ။',
+      empty: 'အတည်ပြုရန် စောင့်ဆိုင်းနေသော ဝန်ထမ်းမရှိပါ။',
+      loading: 'ဖတ်နေသည်…',
+      forbidden: 'ဤစာမျက်နှာကို ကြည့်ရန် စီမံခန့်ခွဲသူအကောင့်လိုအပ်ပါသည်။',
+      approveBtn: 'အတည်ပြုရန်',
+      approving: 'အတည်ပြုနေသည်…',
+      approveSuccess: 'ဝန်ထမ်းကို အတည်ပြုပြီးပါပြီ။ ယခု ဝန်ထမ်းကွက်မှ ဝင်ရောက်နိုင်ပါသည်။',
+    },
+    adminDash: {
+      title: 'စီမံခန့်ခွဲသူ ဒက်ရှ်ဘုတ်',
+      subtitle:
+        'ပလက်ဖောင်း လှုပ်ရှားမှု၊ ဆေးခန်းဝန်ထမ်း အကောင့်များ၊ စာရင်းသစ်များ အတည်ပြုချက်များကို စီမံကြည့်ရှုနိုင်ပါသည်။',
+      tabs: {
+        overview: 'အကျဉ်းချုပ်',
+        staff: 'ဝန်ထမ်း စောင့်ဆိုင်း',
+        clinics: 'ဆေးခန်း စောင့်ဆိုင်း',
+      },
+      cardUsers: 'အကောင့်များ',
+      cardCentersBookings: 'စာရင်းနှင့် လည်ပတ်မှုများ',
+      labelPatients: 'အသိုင်းအဝိုင်း အဖွဲ့ဝင်များ',
+      labelStaff: 'ဆေးခန်းဝန်ထမ်းများ',
+      labelAdmins: 'စီမံခန့်ခွဲသူများ',
+      labelPendingStaff: 'အတည်မပြုရသေးသော ဝန်ထမ်း',
+      labelCenters: 'ART စင်တာ စာရင်းဝင်',
+      labelPendingCenters: 'အတည်မပြုရသေးသော စင်တာ',
+      labelBookings: 'လည်ပတ်မှု တောင်းဆိုမှုများ (အားလုံး)',
+      bookingsByStatus: 'အခြေအနေအလိုက် တောင်းဆိုမှုများ',
+      overviewHint:
+        'ဤတက်ဘ်ကို ဖွင့်သည့်အခါ ဂဏန်းများ ပြန်လည်ဖတ်ပါသည်။ စောင့်ဆိုင်းမှုများအတွက် အခြားတက်ဘ်များသို့ သွားပါ။',
+      overviewEmpty: 'အကျဉ်းချုပ် မဖတ်ရပါ။',
+      clinicsTitle: 'အတည်မပြုရသေးသော ဆေးခန်းစာရင်းများ',
+      clinicsDescription:
+        'ဝန်ထမ်းများက စာရင်းမရှိသေးသော ဆေးခန်းကို မှတ်ပုံတင်နိုင်ပါသည်။ မိတ်ဖက်များနှင့် အတည်ပြုပြီးမှ စာရင်းကို အတည်ပြုပါ။',
+      clinicsEmpty: 'အတည်ပြုရန် စောင့်ဆိုင်းသော ဆေးခန်းမရှိပါ။',
+      centerNickname: 'ဝင်ရောက်ရန် အမည်',
+      centerContact: 'ဆက်သွယ်ရန်',
+      verifyCenterBtn: 'အတည်ပြုပြီး မှတ်ရန်',
+      verifyCenterOk: 'စာရင်းကို အတည်ပြုပြီးပါပြီ။',
+      approveStaffOk: 'ဝန်ထမ်းကို အတည်ပြုပြီးပါပြီ။',
+    },
+    staffDash: {
+      title: 'ဝန်ထမ်း ဒက်ရှ်ဘုတ်',
+      subtitle:
+        'ဆေးခန်းအတွက် လည်ပတ်မှု တောင်းဆိုမှုများ၊ စာကြည့်တိုက် ဆောင်းပါးများ၊ စင်တာအဆင့်များကို ကြည့်ရှုနိုင်ပါသည်။',
+      tabs: {
+        bookings: 'လည်ပတ်မှု တောင်းဆိုမှုများ',
+        article: 'ဆောင်းပါးအသစ်',
+        rankings: 'စင်တာအဆင့်များ',
+      },
+      tabLegend:
+        'ဆေးခန်းရှာရန်မှ အဖွဲ့ဝင်များ ပို့သော ဆေးယူ လည်ပတ်မှု တောင်းဆိုမှုများကို လည်ပတ်မှု တောင်းဆိုမှုများ တက်ဘ်တွင် ကြည့်ပါ။ အခြားတက်ဘ်များတွင် စာကြည့်တိုက် ထုတ်ဝေမှုနှင့် အဆင့်များရှိသည်။',
+      statusFilter: 'အခြေအနေဖြင့် စစ်ထုတ်',
+      statusAll: 'အခြေအနေအားလုံး',
+      adminCenterFilter: 'ဆေးခန်း (စီမံခန့်ခွဲသူ)',
+      adminAllCenters: 'ဆေးခန်းအားလုံး',
+      refresh: 'စာရင်းပြန်ဖတ်',
+      bookingsNeedCenter:
+        'သင့်အကောင့်သည် ဆေးခန်းနှင့် မချိတ်ဆက်ရသေးပါ။ လည်ပတ်မှု တောင်းဆိုမှုများကို မပြနိုင်ပါ။ စီမံခန့်ခွဲသူကို ဆက်သွယ်ပါ။',
+      bookingsLinkedClinicPrefix: 'ဤဆေးခန်းအတွက် လည်ပတ်မှု တောင်းဆိုမှုများကို ကြည့်နေသည်',
+      bookingsLinkedClinicSuffix:
+        'ဆေးခန်းရှာရန်တွင် ဤစင်တာတူညီရွေးသော အဖွဲ့ဝင်များ၏ တောင်းဆိုမှုများသာ ပေါ်လာပါသည်။',
+      bookingsEmpty: 'ဤမြင်ကွင်းနှင့် ကိုက်ညီသော တောင်းဆိုမှုမရှိပါ။',
+      bookingsEmptyStaffHint:
+        'အဖွဲ့ဝင်က တောင်းဆိုပြီးသော်လည်း မမြင်ရပါက သူတို့ရွေးသော ART စင်တာသည် သင့်ဝန်ထမ်းအကောင့် ချိတ်ဆက်ထားသော စင်တာနှင့် ကွဲနိုင်သည်။ စီမံခန့်ခွဲသူက art_center_id ကိုက်ညီမှုကို စစ်ပါ။ သို့မဟုတ် ဝန်ထမ်းကွက်မှ မှန်ကန်သော ဆေးခန်းဖြင့် ထွက်ပြီး ပြန်ဝင်ပါ။',
+      bookingsLinkedIdLabel: 'ချိတ်ဆက်ထားသော စင်တာ ID (အကောင့် ပြင်ရန် စီမံခန့်ခွဲသူကို ပေးပါ)',
+      bookingsEmptyActionsIntro: 'ဤဒက်ရှ်ဘုတ်ရှိ အခြားအပိုင်းများကို ဆက်သုံးနိုင်သည်။',
+      bookingsEmptyGoRankings: 'စင်တာအဆင့်များ ဖွင့်ရန်',
+      bookingsEmptyGoArticle: 'စာကြည့်တိုက် ဆောင်းပါး ထုတ်ဝေရန်',
+      bookingPatient: 'အဖွဲ့ဝင်',
+      bookingStatus: 'အခြေအနေ',
+      note: 'အဖွဲ့ဝင် မှတ်ချက်',
+      accept: 'တောင်းဆိုမှု လက်ခံရန်',
+      pillGiven: 'ဆေးပေးပြီးမှတ်ရန်',
+      cancelBooking: 'လည်ပတ်မှု ပယ်ဖျက်ရန်',
+      articleHeading: 'စာကြည့်တိုက်သို့ ထုတ်ဝေရန်',
+      articleHint:
+        'ခေါင်းစဉ်ရှင်းပြီး လေးမြတ်သော ဘာသာစကားသုံးပါ။ Basics သို့ Care ရွေးပါက စာကြည့်တိုက်တွင် အပိုင်းမှန်ကန်စွာ ပေါ်လာပါသည်။',
+      articleTitle: 'ခေါင်းစဉ်',
+      articleCategory: 'အမျိုးအစား',
+      articleBody: 'စာသား (မထည့်လည်းရ)',
+      articleSubmit: 'ဆောင်းပါး ထုတ်ဝေရန်',
+      articleSuccess: 'ဆောင်းပါး ထုတ်ဝေပြီးပါပြီ။ စာကြည့်တိုက်တွင် မြင်ရပါသည်။',
+      rankClinic: 'ဆေးခန်း',
+      rankTownship: 'နေရာ',
+      rankScore: 'လည်ပတ်မှု စီးဆင်းမှု အမှတ်',
+      rankFootnote:
+        'အမှတ်သည် ဆေးပေးသည့်အဆင့်ပြီးသော သို့မဟုတ် လည်ပတ်မှု ပြီးစီးသော တောင်းဆိုမှုများကို ရေတွက်ပြီး ကြယ်ပွင့်များဖြင့် စီထားသည်။',
     },
     profile: {
       title: 'သင့်ကိုယ်ရေးအချက်အလက်',
       description:
-        'ဤနေရာသည် အသိုင်းအဝိုင်း အဖွဲ့ဝင်များအတွက် ဖြစ်သည်။ လေးစားမှု၊ လျှို့ဝှက်မှုနှင့် အကူအညီကို သင်အရည်အချင်းရှိသည်ဟု သတ်မှတ်သော စကားလုံးများဖြင့် မဟုတ်ဘဲ ရရှိစေမည်။',
+        'ဝင်ရောက်ပါ သို့မဟုတ် အကောင့်ဖွင့်ပါ။ အသိုင်းအဝိုင်း အဖွဲ့ဝင်များသည် လျှို့ဝှက်အမည်ပြောင်သုံးပြီး ဆေးခန်းဝန်ထမ်းများသည် အပြည့်အစုံ အမည်ဖြင့် မှတ်ပုံတင်ပြီး စီမံခန့်ခွဲသူ၏ အတည်ပြုချက်ရမှ ဝင်ရောက်နိုင်ပါသည်။',
       cardTitle: 'အသိုင်းအဝိုင်း အဖွဲ့ဝင်',
       cardBody:
-        'အကောင့်ကိရိယာများနှင့် မှတ်တမ်းများကို RetroHelp API နှင့် ချိတ်ဆက်သည့်အခါ ဤနေရာတွင်မည်ဖြစ်သည်။',
+        'ဝင်ရောက်ပြီးနောက် ဆေးယူ လည်ပတ်မှု တောင်းဆိုမှုများနှင့် ကိုယ်ပိုင် လည်ပတ်မှတ်တမ်းကို အောက်တွင်ကြည့်နိုင်ပါသည်။',
       privacyNote:
         'ထုတ်သုံးမှုတွင် HTTPS သုံးပါသည်။ ဝင်ရောက်ခွင့်လက်မှတ်ကို ဤဘရောက်ဇာတွင်သာ သိမ်းထားပြီး ထွက်သည့်အထိ သုံးပါသည်။ အဖွဲ့ဝင်များကို ဥပဒမည်မဟုတ်ဘဲ သင်ရွေးသော အမည်ပြောင်ဖြင့်သာ ခွဲခြားပါသည်။',
       tabSignIn: 'ဝင်ရောက်ရန်',
@@ -271,6 +571,31 @@ export const translations = {
       tabStaff: 'ဝန်ထမ်း',
       registerIntro:
         'ထူးခြားသော အမည်ပြောင်နှင့် စကားဝှက် အနည်းဆင်း ၈ လုံးဖြင့် လျှို့ဝှက်အကောင့်ဖွင့်ပါ။',
+      registerAccountType: 'မှတ်ပုံတင်မည့် အမျိုးအစား',
+      registerAsPatient: 'အသိုင်းအဝိုင်း အဖွဲ့ဝင်',
+      registerAsStaff: 'ဆေးခန်းဝန်ထမ်း',
+      staffRegisterIntro:
+        'ဆေးခန်းမှ သိရှိသော အပြည့်အစုံ အမည်ကို သုံးပါ။ စီမံခန့်ခွဲသူ အတည်မပြုမချင်း ဝင်ရောက်မရပါ။',
+      staffOptionalNickname: 'ပြသရန် အမည်ပြောင် (မထည့်လည်းရ)',
+      staffOptionalNicknameHelp:
+        'ထည့်ပါက ထူးခြားမှုရှိရမည်ဖြစ်ပြီး အခြားအသုံးပြုသူများကဲ့သို့ သိမ်းပါသည်။ ဝင်ရောက်မှုတွင် အပြည့်အစုံ အမည်သုံးပါသည်။',
+      staffClinicSelectLabel: 'သင့်ဆေးခန်း (စာရင်း)',
+      staffClinicSelectPh: 'အလုပ်လုပ်သော ART စင်တာကို ရွေးပါ…',
+      staffRegisterNewListing: 'ကျွန်ုပ်၏ ဆေးခန်းမပါ — စာရင်းအသစ် မှတ်ပုံတင်ရန်',
+      staffNewCenterIntro:
+        'စာရသစ်အတွက် လိုအပ်သည်—ဆေးခန်းအမည်၊ မြို့နယ်၊ နယ်မြေ၊ ဆက်သွယ်ရန်နံပါတ်။ မထည့်လည်းရ—ပုံ URL၊ မြေပုံကိုဩဒိနိတ်များ။ စီမံခန့်ခွဲသူက နောက်မှ အတည်ပြုနိုင်ပါသည်။',
+      newCenterName: 'ဆေးခန်းအမည်',
+      newCenterTownship: 'မြို့နယ်',
+      newCenterArea: 'နယ်မြေ',
+      newCenterContact: 'ဆက်သွယ်ရန်နံပါတ်',
+      newCenterImageOptional: 'ပုံ URL (မထည့်လည်းရ)',
+      newCenterLatOptional: 'လတ္တီကျု (မထည့်လည်းရ)',
+      newCenterLngOptional: 'လောင်ဂျီကျု (မထည့်လည်းရ)',
+      staffClinicRequired: 'ဆေးခန်းရွေးပါ သို့မဟုတ် “မပါ” သို့ပြောင်းပြီး အသစ်စာရင်း ဖြည့်ပါ။',
+      staffLoginClinicLabel: 'ဝင်ရောက်ရန် ဆေးခန်း',
+      staffLoginClinicPh: 'မှတ်ပုံတင်ထားသော ဆေးခန်းတူညီရွေးပါ',
+      staffPendingBanner:
+        'ကျေးဇူးတင်ပါသည်။ မှတ်ပုံတင်မှု သိမ်းပြီးပါပြီ။ စီမံခန့်ခွဲသူ၏ အတည်ပြုချက်ကို စောင့်ပြီး ဝန်ထမ်းကွက်မှ ဝင်ရောက်ပါ။',
       passwordConfirm: 'စကားဝှက်အတည်ပြုရန်',
       registerSubmit: 'အကောင့်ဖွင့်ရန်',
       nicknameLabel: 'အမည်ပြောင် (လျှို့ဝှက်)',
@@ -282,30 +607,82 @@ export const translations = {
       saveNickname: 'အမည်ပြောင်သိမ်းရန်',
       saving: 'သိမ်းနေသည်…',
       loggedInAs: 'ဝင်ရောက်ထား',
+      loggedInClinic: 'ချိတ်ဆက်ထားသော ဆေးခန်း',
       logout: 'ထွက်ရန်',
       staffHint: 'ဝန်ထမ်းဝင်ရောက်မှုတွင် မှတ်ပုံတည်အပြည့်အစုံကို သုံးပါ။',
+      adminSignInToggle: 'စီမံခန့်ခွဲသူ ဝင်ရောက်ရန်',
+      adminSignInHelp:
+        'ပလက်ဖောင်း စီမံခန့်ခွဲသူသာဖြစ်ပါက ဖွင့်ပါ။ ဆေးခန်းမရွေးပါ။ အောက်ပါ အချက်အလက်များအတိုင်း ဆာဗာမှ အမည်နှင့် စကားဝှက်သုံးပါ။',
+      adminCalloutTitle: 'စီမံခန့်ခွဲသူ အချက်အလက်များသည် ဆာဗာတွင်ရှိသည်',
+      adminCalloutBody:
+        'အများအားဖြင့် backend/.env တွင် RETROHELP_ADMIN_FULL_NAME နှင့် RETROHELP_ADMIN_PASSWORD ထား၍ php artisan db:seed --class=AdminUserSeeder လုပ်ပါ။ ဒေတာဘေ့စ်တွင် ဖန်တီးထားသော စီမံခန့်ခွဲသူများအတွက် အပြည့်အစုံ အမည် သို့မဟုတ် အမည်ပြောင် (အပြည့်အစုံ အမည်မရှိပါက) ရိုက်နိုင်သည်—အဖွဲ့ဝင် အမည်ပြောင်မဟုတ်ပါ။ ဆေးခန်းဝန်ထမ်းဝင်ရောက်မှုနှင့် မတူပါ။',
+      adminFullNameLabel: 'စီမံခန့်ခွဲသူ အပြည့်အစုံ အမည် သို့မဟုတ် အမည်ပြောင်',
+      adminFullNamePlaceholder: 'ဥပမာ RetroHelp Admin',
+      adminFullNameHint:
+        'ဒေတာဘေ့စ်ရှိ စီမံခန့်ခွဲသူ၏ full_name သို့မဟုတ် nickname နှင့် ကိုက်ညီရမည်။ seed မှာသုံးသော RETROHELP_ADMIN_FULL_NAME လည်းဖြစ်နိုင်သည်။',
+      adminPasswordLabel: 'စီမံခန့်ခွဲသူ စကားဝှက်',
+      adminPasswordHint: 'backend/.env ရှိ RETROHELP_ADMIN_PASSWORD နှင့် ကိုက်ညီရမည် (seed ပြီးနောက်)။',
+      loginAdmin: 'စီမံခန့်ခွဲသူအနေဖြင့် ဝင်ရောက်ရန်',
       nicknameSaved: 'အမည်ပြောင် ပြင်ဆင်ပြီးပါပြီ။',
+      recordsTitle: 'သင့်စောင့်ရှောက်မှု လှုပ်ရှားမှု',
+      recordsIntro:
+        'ဤဘရောက်ဇာတွင် ဝင်ရောက်ထားစဉ်သာ မြင်ရပါသည်။ တောင်းဆိုမှု သို့မဟုတ် ကိုယ်ပိုင်မှတ်တမ်း အသစ်အတွက် ဆေးခန်းရှာစာမျက်နှာသို့ သွားပါ။',
+      visitLogTitle: 'ကိုယ်ပိုင် လည်ပတ်မှတ်တမ်း',
+      visitLogHelp:
+        '“ကိုယ်ပိုင် လမ်းကြောင်း သိမ်းရန်” မှ ထည့်သော မှတ်တမ်းများ။ ဆေးခန်းသည် ဤစာရင်းကို မမြင်ပါ။',
+      visitLogEmpty:
+        'မရှိသေးပါ။ ဆေးခန်းရှာရန်တွင် မြေပုံ ဖွင့်ပြီး ကိုယ်ပိုင် လမ်းကြောင်း သိမ်းလိုပါက သိမ်းနိုင်ပါသည်။',
+      bookingsTitle: 'ကျွန်ုပ်၏ တောင်းဆိုမှု စက်ရှင်များ',
+      bookingsHelp:
+        'တစ်ခုချင်းစီတွင် တိုးတက်မှုကို မြင်ရပါသည်။ ဆေးခန်းမအတည်ပြုမချင်း စောင့်ဆိုင်း၊ ပြီးလျှင် အတည်ပြုပြီး။ အတည်ပြုပြီးနောက် သတ်မှတ်ချိန်မတိုင်မီ “လာမည်” ကို ရွေးချယ်ရမည်—မရွေးပါက တောင်းဆိုမှု ပယ်ဖျက်မည်ဖြစ်ပြီး အတည်ပြုပြီးဖြစ်သည့်တိုင်အောင် ပယ်ဖျက်နိုင်ပါသည်။',
+      bookingsEmpty: 'ဆေးယူ လည်ပတ်မှု တောင်းဆိုမှု မပို့ရသေးပါ။',
+      bookingsViewFindClinic: 'ဆေးခန်းရှာရန်',
+      bookingsActiveHeading: 'လုပ်ဆောင်နေသည်',
+      bookingsClosedHeading: 'ပြီးခဲ့သော စက်ရှင်များ',
+      bookingAt: 'ဆေးခန်း',
+      bookingRequestedOn: 'တောင်းဆိုသည့်အချိန်',
+      bookingWaitClinic: 'စောင့်ဆိုင်း — ဆေးခန်းလက်ခံချိန် စောင့်နေသည်။',
+      bookingWaitPill: 'ဝန်ထမ်းက ဆေးပေးပြီးကြောင်း မှတ်သည့်အထိ စောင့်ဆိုင်းနေသည်။',
+      bookingDone: 'လည်ပတ်မှု ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။',
+      bookingProgressLabel: 'တိုးတက်မှု',
+      respondByIntro:
+        'ဆေးခန်းက လက်ခံပြီးပါပြီ။ သင့်စက်ပေါ်ရှိ ဒေသစာဖြင့် ဤအချိန်မတိုင်မီ “လာမည် — ခရီးစ” ကို နှိပ်ပါ—မဟုတ်ပါက တောင်းဆိုမှု ပယ်ဖျက်မည်။',
+      respondByUnknown: 'ပယ်ဖျက်ရန် နောက်ဆုံးအချိန် မသတ်မှတ်ရသေးပါ — စာမျက်နှာပြန်လည်တင်ပါ။',
+      respondByTimeLeftPrefix: 'ကျန်ချိန်:',
+      bookingActionOnMyWay: 'လာမည် — ခရီးစ',
+      bookingActionArrived: 'ရောက်ပြီ',
+      bookingActionComplete: 'လည်ပတ်မှု ပြီးမြောက်ကြောင်း မှတ်ရန်',
+      bookingActionWorking: 'ပြင်ဆင်နေသည်…',
+      bookingActionCancel: 'တောင်းဆိုမှု ပယ်ဖျက်ရန်',
+      bookingCancelConfirm:
+        'ဤလည်ပတ်မှု တောင်းဆိုမှုကို ပယ်ဖျက်မလား။ နောက်မှ ဆေးခန်းရှာရန်မှ ပြန်ပို့နိုင်ပါသည်။',
+      cancellationByPatient: 'သင်က ဤတောင်းဆိုမှုကို ပယ်ဖျက်ခဲ့သည်။',
+      cancellationByClinic: 'ဆေးခန်းက ဤတောင်းဆိုမှုကို ပယ်ဖျက်ခဲ့သည်။',
+      bookingCompleteNote:
+        '“ဆေးပေးပြီး” ပြီးနောက် ဤနေရာတွင် ပြီးမြောက်ကြောင်း နှိပ်ပါ။ ကြယ်ပွင့်သုံးသပ်ချက် ထည့်လိုပါက နောက်ပိုင်းတွင် ထည့်သွင်းနိုင်ပါသည်။',
+      cancellationNoComing:
+        'ပယ်ဖျက်ပြီး — သတ်မှတ်ချိန်မတိုင်မီ လာမည်ကို အတည်မပြုပါ။',
+      bookingStatus: {
+        requested: 'စောင့်ဆိုင်း',
+        accepted: 'အတည်ပြုပြီး',
+        on_my_way: 'လမ်းထွက်ပြီ',
+        arrived: 'ဆေးခန်းရောက် — ဆေးစောင့်',
+        pill_given: 'ဆေးပေးပြီး — ပြီးမြောက်ကြောင်း အတည်ပြုပါ',
+        completed: 'ပြီးစီးပါပြီ',
+        cancelled: 'ပယ်ဖျက်ပြီး',
+      },
+      bookingSteps: {
+        pending: 'စောင့်ဆိုင်း',
+        approved: 'အတည်ပြု',
+        coming: 'လာမည်',
+        arrived: 'ရောက်',
+        pill: 'ဆေး',
+        done: 'ပြီး',
+      },
     },
     staff: {
-      title: 'ဆေးပေးရန် စောင့်ဆိုင်းမှုများ',
-      description:
-        'အဖွဲ့ဝင်များကို အမည်ပြောင်ဖြင့်သာ ပြပါသည်။ ဆေးကို လက်တွေ့ပေးသည့်အခါ ပေးပြီးကြောင်း မှတ်သားပါ။',
-      empty: 'စောင့်ဆိုင်းမှု မရှိပါ။',
-      markGiven: 'ပေးပြီးအဖြစ် မှတ်ရန်',
       working: 'ပြင်ဆင်နေသည်…',
       at: 'စင်တာ',
-      member: 'အဖွဲ့ဝင်',
-    },
-    receipt: {
-      title: 'လက်ခံမှုအတည်ပြုရန်',
-      subtitle:
-        'ဆေးခန်းက ဆေးပေးပြီးကြောင်း မှတ်သားထားပါသည်။ လက်ခံပြီးပါက ဤနေရာတွင် အတည်ပြုပါ။',
-      at: 'နေရာ',
-      when: 'ပေးသည့်အချိန်',
-      confirm: 'လက်ခံမှုအတည်ပြုရန်',
-      busy: 'အတည်ပြုနေသည်…',
-      done: 'ကျေးဇူးတင်ပါသည်—မှတ်တမ်းပြင်ဆင်ပြီးပါပြီ။',
-      none: 'အတည်ပြုရန် စောင့်ဆိုင်းမှု မရှိပါ။',
     },
     footer: {
       quickLinks: 'လင့်ခ်များ',
@@ -345,6 +722,10 @@ export const translations = {
         'မင်္ဂလာပါ။ အထွေထွေအချက်အလက်များသို့ ညွှန်ပြရန် ဤနေရာတွင် ရှိပါသည်။ ဘာသိလိုပါသလဲ။',
       botReply:
         'မျှဝေပေးသည့်အတွက် ကျေးဇူးတင်ပါသည်။ ကျွန်ုပ်သည် စမ်းသပ်အကူအညီပေးသူဖြစ်ပြီး ဆေးပညာဆိုင်ရာ လမ်းညွှန်ချက်ပေးနိုင်ခြင်းမရှိပါ။ ကိုယ်ရေးကိုယ်တာ စောင့်ရှောက်မှု ဆုံးဖြတ်ချက်များအတွက် ဆေးခန်းကို ဆက်သွယ်ပါ။ ပညာရေးဆောင်းပါးများအတွက် စာကြည့်တိုက်ကို လည်းကြည့်ရှုနိုင်ပါသည်။',
+      aiThinking: 'စဉ်းစားနေသည်…',
+      aiError: 'အဖြေမရပါ။ ထပ်စမ်းပါ။',
+      aiUnavailable:
+        'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက OPENAI_API_KEY သတ်မှတ်ရန် တောင်းပါ။',
     },
     lang: {
       english: 'English',

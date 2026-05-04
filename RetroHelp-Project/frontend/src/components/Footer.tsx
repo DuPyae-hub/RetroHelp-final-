@@ -81,7 +81,7 @@ export function Footer() {
               {t.footer.languageHeading}
             </p>
             <div className="mt-4">
-              <BurmeseToggle tone="dark" />
+              <BurmeseToggle tone="dark" pillLayoutId="lang-pill-footer" />
             </div>
             <p className="mt-8 text-xs text-slate-500">{t.footer.rights}</p>
           </div>

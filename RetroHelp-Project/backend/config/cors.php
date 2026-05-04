@@ -19,9 +19,17 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => [
-        'http://localhost:5173',
-    ],
+    /*
+     * Local Vite may be opened as http://localhost:5173 or http://127.0.0.1:5173 — both must match.
+     * Override with CORS_ALLOWED_ORIGINS=http://localhost:5174,... in .env
+     */
+    'allowed_origins' => array_values(array_filter(array_map(
+        'trim',
+        explode(',', (string) env(
+            'CORS_ALLOWED_ORIGINS',
+            'http://localhost:5173,http://127.0.0.1:5173',
+        )),
+    ))),
 
     'allowed_origins_patterns' => [],
 

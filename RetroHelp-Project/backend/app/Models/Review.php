@@ -12,6 +12,7 @@ class Review extends Model
     protected $fillable = [
         'user_id',
         'clinic_id',
+        'booking_id',
         'rating',
         'comment',
     ];
@@ -31,5 +32,10 @@ class Review extends Model
     public function clinic(): BelongsTo
     {
         return $this->belongsTo(ArtCenter::class, 'clinic_id');
+    }
+
+    public function booking(): BelongsTo
+    {
+        return $this->belongsTo(Booking::class, 'booking_id');
     }
 }

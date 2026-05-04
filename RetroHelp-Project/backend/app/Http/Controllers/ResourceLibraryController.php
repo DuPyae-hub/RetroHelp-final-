@@ -24,4 +24,23 @@ class ResourceLibraryController extends Controller
             'data' => $query->get(),
         ]);
     }
+
+    /**
+     * Clinic staff and administrators: publish a library article.
+     */
+    public function store(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'content' => ['nullable', 'string', 'max:60000'],
+            'category' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $item = ResourceLibrary::query()->create($data);
+
+        return response()->json([
+            'message' => 'Article published to the library.',
+            'data' => $item,
+        ], 201);
+    }
 }
