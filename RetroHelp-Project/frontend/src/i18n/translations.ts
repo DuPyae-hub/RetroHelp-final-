@@ -358,7 +358,8 @@ export const translations = {
         'Thank you for sharing that. I am a demo assistant and cannot give medical guidance. Please reach out to your clinic or trusted professional for personal care decisions. You can also browse the Library for educational articles.',
       aiThinking: 'Thinking…',
       aiError: 'Could not get a reply. Please try again.',
-      aiUnavailable: 'AI support is not enabled on the server yet. Ask your administrator to set OPENAI_API_KEY.',
+      aiUnavailable:
+        'AI support is not enabled on the server yet. Ask your administrator to set GEMINI_API_KEY (Google AI Studio).',
     },
     lang: {
       english: 'English',
@@ -725,7 +726,7 @@ export const translations = {
       aiThinking: 'စဉ်းစားနေသည်…',
       aiError: 'အဖြေမရပါ။ ထပ်စမ်းပါ။',
       aiUnavailable:
-        'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက OPENAI_API_KEY သတ်မှတ်ရန် တောင်းပါ။',
+        'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက GEMINI_API_KEY (Google AI Studio) သတ်မှတ်ရန် တောင်းပါ။',
     },
     lang: {
       english: 'English',

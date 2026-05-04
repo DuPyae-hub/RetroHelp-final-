@@ -64,7 +64,7 @@ export function FloatingSupport() {
       ])
     } catch (err) {
       const msg = getApiErrorMessage(err)
-      if (msg.includes('OPENAI_API_KEY') || msg.includes('not configured')) {
+      if (msg.includes('GEMINI_API_KEY') || msg.includes('not configured')) {
         setSendError(t.support.aiUnavailable)
       } else {
         setSendError(msg || t.support.aiError)

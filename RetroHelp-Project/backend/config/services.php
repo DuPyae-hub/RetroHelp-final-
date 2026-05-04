@@ -36,13 +36,12 @@ return [
     ],
 
     /*
-    | OpenAI (customer support chat in app). Set OPENAI_API_KEY to enable.
-    | Optional: OPENAI_API_BASE for compatible proxies (default https://api.openai.com/v1).
+    | Google Gemini (customer support chat). Set GEMINI_API_KEY (AI Studio / Vertex).
+    | Model id examples: gemini-2.0-flash, gemini-1.5-flash, gemini-3-flash-preview
     */
-    'openai' => [
-        'api_key' => env('OPENAI_API_KEY'),
-        'api_base' => env('OPENAI_API_BASE', 'https://api.openai.com/v1'),
-        'chat_model' => env('OPENAI_CHAT_MODEL', 'gpt-4o-mini'),
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY'),
+        'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
     ],
 
 ];
