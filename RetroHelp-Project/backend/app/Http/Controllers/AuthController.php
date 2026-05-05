@@ -242,6 +242,7 @@ class AuthController extends Controller
         }
 
         $admin = $matches->first(static fn (User $u): bool => (int) $u->role_id === RoleId::Admin);
+        $staffMatches = $matches->filter(static fn (User $u): bool => (int) $u->role_id === RoleId::ClinicStaff);
 
         if ($intentAdmin && $admin === null) {
             throw ValidationException::withMessages([
@@ -251,9 +252,17 @@ class AuthController extends Controller
             ]);
         }
 
-        if ($admin !== null) {
+        if ($intentAdmin) {
             $user = $admin;
         } else {
+            if ($staffMatches->isEmpty() && $admin !== null) {
+                throw ValidationException::withMessages([
+                    'full_name' => [
+                        'This name and password belong to an administrator account. Enable "Administrator sign-in" to continue, or use a clinic staff account.',
+                    ],
+                ]);
+            }
+
             $centerId = $credentials['art_center_id'] ?? null;
             if ($centerId === null && ! empty($credentials['art_center_nickname'])) {
                 $center = ArtCenter::query()->where('nickname', $credentials['art_center_nickname'])->first();
@@ -271,17 +280,16 @@ class AuthController extends Controller
                 ]);
             }
 
-            $exact = $matches->first(static function (User $u) use ($centerId): bool {
-                return (int) $u->role_id === RoleId::ClinicStaff
-                    && $u->art_center_id !== null
+            $exact = $staffMatches->first(static function (User $u) use ($centerId): bool {
+                return $u->art_center_id !== null
                     && (int) $u->art_center_id === (int) $centerId;
             });
 
             if ($exact !== null) {
                 $user = $exact;
             } else {
-                $legacy = $matches->filter(static function (User $u): bool {
-                    return (int) $u->role_id === RoleId::ClinicStaff && $u->art_center_id === null;
+                $legacy = $staffMatches->filter(static function (User $u): bool {
+                    return $u->art_center_id === null;
                 });
                 if ($legacy->count() === 1) {
                     $user = $legacy->first();
