@@ -17,6 +17,9 @@ export type TopRankedClinic = {
   rating_avg: string | number | null
   total_reviews: number | null
   is_verified: boolean
+  art_pills_available?: boolean
+  art_pills_count?: number | null
+  art_three_month_people_count?: number | null
   booking_pill_given_count?: number
 }
 
@@ -36,6 +39,9 @@ export type ArtCenterSearchItem = {
   is_verified: boolean
   rating_avg: string | number | null
   total_reviews: number | null
+  art_pills_available?: boolean
+  art_pills_count?: number | null
+  art_three_month_people_count?: number | null
   completed_bookings_count?: number
 }
 
@@ -48,6 +54,9 @@ export type ArtCenterDetail = {
   latitude: string | number | null
   longitude: string | number | null
   is_verified: boolean
+  art_pills_available?: boolean
+  art_pills_count?: number | null
+  art_three_month_people_count?: number | null
 }
 
 export type NavigationLogItem = {

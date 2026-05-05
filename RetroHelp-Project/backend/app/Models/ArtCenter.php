@@ -19,6 +19,8 @@ class ArtCenter extends Model
         'longitude',
         'contact_no',
         'is_verified',
+        'art_pills_available',
+        'art_pills_count',
         'township',
         'area',
         'rating_avg',
@@ -29,6 +31,8 @@ class ArtCenter extends Model
     {
         return [
             'is_verified' => 'boolean',
+            'art_pills_available' => 'boolean',
+            'art_pills_count' => 'integer',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
             'rating_avg' => 'decimal:2',

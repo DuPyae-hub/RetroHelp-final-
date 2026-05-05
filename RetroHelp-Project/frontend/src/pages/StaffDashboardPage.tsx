@@ -100,6 +100,12 @@ export function StaffDashboardPage() {
   const [articleBusy, setArticleBusy] = useState(false)
   const [articleMsg, setArticleMsg] = useState<string | null>(null)
   const [articleErr, setArticleErr] = useState<string | null>(null)
+  const [availabilityLoading, setAvailabilityLoading] = useState(false)
+  const [availabilityBusy, setAvailabilityBusy] = useState(false)
+  const [availabilityError, setAvailabilityError] = useState<string | null>(null)
+  const [availabilityMsg, setAvailabilityMsg] = useState<string | null>(null)
+  const [availabilityAvailable, setAvailabilityAvailable] = useState(false)
+  const [availabilityCount, setAvailabilityCount] = useState(0)
 
   const admin = user && isAdmin(user.role_id)
   const rawCenter = user?.art_center_id ?? user?.art_center?.id
@@ -107,6 +113,7 @@ export function StaffDashboardPage() {
     rawCenter != null && Number.isFinite(Number(rawCenter)) && Number(rawCenter) > 0
       ? Number(rawCenter)
       : null
+  const targetCenterId = admin ? adminCenterId : staffCenterId
 
   const loadBookings = useCallback(async () => {
     setBookingsLoading(true)
@@ -175,6 +182,43 @@ export function StaffDashboardPage() {
     }
   }, [admin, tab])
 
+  useEffect(() => {
+    if (!user || !isStaffOrAdmin(user.role_id) || tab !== 'bookings') return
+    if (targetCenterId == null) {
+      setAvailabilityError(null)
+      setAvailabilityMsg(null)
+      return
+    }
+    let cancelled = false
+    setAvailabilityLoading(true)
+    setAvailabilityError(null)
+    void (async () => {
+      try {
+        const { data } = await api.get<{
+          data: {
+            art_pills_available?: boolean
+            art_pills_count?: number
+            art_three_month_people_count?: number
+          }
+        }>(
+          `/api/art-centers/${targetCenterId}`,
+        )
+        if (cancelled) return
+        setAvailabilityAvailable(Boolean(data?.data?.art_pills_available))
+        setAvailabilityCount(
+          Math.max(0, Number(data?.data?.art_three_month_people_count ?? data?.data?.art_pills_count ?? 0)),
+        )
+      } catch (err) {
+        if (!cancelled) setAvailabilityError(getApiErrorMessage(err))
+      } finally {
+        if (!cancelled) setAvailabilityLoading(false)
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [tab, targetCenterId, user])
+
   const statusLabel = useCallback(
     (s: string) => {
       const key = s as keyof typeof t.profile.bookingStatus
@@ -223,6 +267,42 @@ export function StaffDashboardPage() {
     }
   }
 
+  const saveAvailability = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (targetCenterId == null) return
+    setAvailabilityBusy(true)
+    setAvailabilityError(null)
+    setAvailabilityMsg(null)
+    try {
+      const safeCount = Math.max(0, Math.floor(Number(availabilityCount) || 0))
+      await api.patch(`/api/art-centers/${targetCenterId}/availability`, {
+        art_pills_available: availabilityAvailable,
+        art_pills_count: availabilityAvailable ? safeCount : 0,
+        art_three_month_people_count: availabilityAvailable ? safeCount : 0,
+      })
+      setAvailabilityMsg(t.staffDash.availabilitySaved)
+      setAvailabilityCount(availabilityAvailable ? safeCount : 0)
+      if (admin) {
+        setCentersForAdmin((prev) =>
+          prev.map((c) =>
+            c.id === targetCenterId
+              ? {
+                  ...c,
+                  art_pills_available: availabilityAvailable,
+                  art_pills_count: availabilityAvailable ? safeCount : 0,
+                  art_three_month_people_count: availabilityAvailable ? safeCount : 0,
+                }
+              : c,
+          ),
+        )
+      }
+    } catch (err) {
+      setAvailabilityError(getApiErrorMessage(err))
+    } finally {
+      setAvailabilityBusy(false)
+    }
+  }
+
   const bookingSummary = useMemo(() => {
     const byStatus = bookings.reduce<Record<string, number>>((acc, b) => {
       acc[b.status] = (acc[b.status] ?? 0) + 1
@@ -265,6 +345,25 @@ export function StaffDashboardPage() {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 3)
   }, [bookings])
+
+  const queueStatusBreakdown = useMemo(() => {
+    const byStatus = filteredBookings.reduce<Record<string, number>>((acc, row) => {
+      acc[row.status] = (acc[row.status] ?? 0) + 1
+      return acc
+    }, {})
+    return [
+      { label: 'Requested', value: byStatus.requested ?? 0, tone: 'text-amber-800 bg-amber-100' },
+      { label: 'Accepted', value: byStatus.accepted ?? 0, tone: 'text-sky-800 bg-sky-100' },
+      { label: 'In route', value: (byStatus.on_my_way ?? 0) + (byStatus.arrived ?? 0), tone: 'text-indigo-800 bg-indigo-100' },
+      { label: 'Done', value: (byStatus.pill_given ?? 0) + (byStatus.completed ?? 0), tone: 'text-emerald-800 bg-emerald-100' },
+    ]
+  }, [filteredBookings])
+
+  const selectedCenterName = useMemo(() => {
+    if (!admin) return user?.art_center?.name ?? 'Your linked clinic'
+    if (adminCenterId == null) return 'All clinics'
+    return centersForAdmin.find((c) => c.id === adminCenterId)?.name ?? `Clinic #${adminCenterId}`
+  }, [admin, adminCenterId, centersForAdmin, user?.art_center?.name])
 
   if (authLoading) {
     return (
@@ -348,7 +447,49 @@ export function StaffDashboardPage() {
           {tab === 'bookings' && (
             <motion.div variants={staggerItem} className="space-y-5 lg:col-span-12">
               <div className="grid gap-5 lg:grid-cols-12">
-                <div className={`flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:col-span-5 ${glassPanel} p-5 sm:p-6`}>
+                <div className={`flex flex-col gap-4 lg:col-span-5 ${glassPanel} p-5 sm:p-6`}>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/60 bg-white/45 p-3">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-stone-500">Selected clinic</p>
+                      <p className="mt-1 text-sm font-semibold text-teal-900">{selectedCenterName}</p>
+                    </div>
+                    <div className="rounded-2xl border border-white/60 bg-white/45 p-3">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-stone-500">ART pills</p>
+                      <div className="mt-1 flex items-center justify-between">
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                            availabilityAvailable ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'
+                          }`}
+                        >
+                          {availabilityAvailable ? 'Available' : 'Low / Out'}
+                        </span>
+                        <motion.span
+                          key={`queue-pill-${availabilityCount}`}
+                          initial={{ scale: 0.9, opacity: 0.6 }}
+                          animate={{ scale: [0.95, 1.08, 1], opacity: 1 }}
+                          transition={{ duration: 0.5 }}
+                          className="text-base font-extrabold text-stone-900 tabular-nums"
+                        >
+                          {availabilityAvailable ? availabilityCount : 0}
+                        </motion.span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-white/60 bg-white/35 p-3">
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-wide text-stone-500">
+                      Queue at a glance
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {queueStatusBreakdown.map((row) => (
+                        <span
+                          key={row.label}
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${row.tone}`}
+                        >
+                          {row.label}: {row.value}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                   <div className="flex flex-wrap items-end gap-3">
                     <label className="block min-w-[13rem] text-sm font-semibold text-stone-800">
                       <span className="mb-1 block">{t.staffDash.searchLabel}</span>
@@ -397,13 +538,25 @@ export function StaffDashboardPage() {
                       </label>
                     ) : null}
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => void loadBookings()}
-                    className="rounded-2xl border border-teal-300/50 bg-teal-500/15 px-4 py-2 text-sm font-semibold text-teal-900 backdrop-blur-md transition hover:bg-teal-500/25"
-                  >
-                    {t.staffDash.refresh}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void loadBookings()}
+                      className="rounded-2xl border border-teal-300/50 bg-teal-500/15 px-4 py-2 text-sm font-semibold text-teal-900 backdrop-blur-md transition hover:bg-teal-500/25"
+                    >
+                      {t.staffDash.refresh}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setStatusFilter('requested')
+                        setBookingSearch('')
+                      }}
+                      className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-100"
+                    >
+                      Focus requested
+                    </button>
+                  </div>
                 </div>
 
                 <div className={`lg:col-span-7 ${glassPanel} p-5 sm:p-6`}>
@@ -477,6 +630,69 @@ export function StaffDashboardPage() {
                       ) : null}
                     </div>
                   ) : null}
+                  <form onSubmit={saveAvailability} className="mt-4 space-y-3 rounded-2xl border border-white/60 bg-white/40 p-4 backdrop-blur">
+                    <div>
+                      <p className="text-sm font-bold text-stone-900">{t.staffDash.availabilityTitle}</p>
+                      <p className="text-xs text-stone-600">{t.staffDash.availabilityHint}</p>
+                    </div>
+                    <p className="text-xs text-stone-700">
+                      {t.staffDash.availabilityClinicLabel}:{' '}
+                      <span className="font-semibold text-teal-900">
+                        {targetCenterId == null ? t.staffDash.adminAllCenters : `#${targetCenterId}`}
+                      </span>
+                    </p>
+                    <label className="flex items-center justify-between rounded-xl border border-teal-100 bg-teal-50/70 px-3 py-2 text-sm font-semibold text-teal-900">
+                      <span>{t.staffDash.availabilityToggle}</span>
+                      <input
+                        type="checkbox"
+                        checked={availabilityAvailable}
+                        onChange={(e) => setAvailabilityAvailable(e.target.checked)}
+                        disabled={availabilityLoading || targetCenterId == null}
+                        className="h-4 w-4 accent-teal-700"
+                      />
+                    </label>
+                    <label className="block text-sm font-semibold text-stone-800">
+                      <span className="mb-1 block">{t.staffDash.availabilityCount}</span>
+                      <input
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={availabilityCount}
+                        onChange={(e) => setAvailabilityCount(Number(e.target.value))}
+                        disabled={availabilityLoading || !availabilityAvailable || targetCenterId == null}
+                        className="w-full rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-sm text-stone-900 backdrop-blur-md"
+                      />
+                    </label>
+                    <div className="space-y-1">
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-stone-500">
+                        {t.staffDash.availabilityQuickSet}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {[1, 2, 3, 5, 10].map((n) => (
+                          <button
+                            key={n}
+                            type="button"
+                            onClick={() => {
+                              setAvailabilityAvailable(true)
+                              setAvailabilityCount(n)
+                            }}
+                            className="rounded-xl border border-teal-200 bg-teal-50 px-2.5 py-1 text-xs font-semibold text-teal-900 transition hover:bg-teal-100"
+                          >
+                            {n} person / 3m
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {availabilityError ? <p className="text-xs text-rose-700">{availabilityError}</p> : null}
+                    {availabilityMsg ? <p className="text-xs text-emerald-700">{availabilityMsg}</p> : null}
+                    <button
+                      type="submit"
+                      disabled={availabilityBusy || availabilityLoading || targetCenterId == null}
+                      className="w-full rounded-2xl border border-teal-300/50 bg-teal-500/15 px-4 py-2 text-sm font-semibold text-teal-900 backdrop-blur-md transition hover:bg-teal-500/25 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {targetCenterId == null ? t.staffDash.availabilityNeedClinic : t.staffDash.availabilitySave}
+                    </button>
+                  </form>
                 </div>
               </div>
 

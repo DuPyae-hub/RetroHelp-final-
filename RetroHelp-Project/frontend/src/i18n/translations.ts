@@ -68,6 +68,9 @@ export const translations = {
       empty: 'No clinics match that keyword yet. Try another search or clear the box to see all.',
       verified: 'Verified',
       visitsLabel: 'Completed visits',
+      artAvailable: 'ART pills available',
+      artUnavailable: 'ART pills low/out',
+      artCountLabel: '3-month coverage (people)',
       viewMap: 'Map & visit',
       mapSignInHint:
         'Sign in on your Profile with your nickname to open the map, request a pill pick-up for the clinic to see, or save a private route plan to your visit log.',
@@ -220,6 +223,16 @@ export const translations = {
       presetCare: 'Preset: Care',
       rankSearchPh: 'Search ranking table…',
       workflowSnapshot: 'Workflow snapshot',
+      availabilityTitle: 'ART pill availability',
+      availabilityHint:
+        'Keep your clinic stock updated so members can quickly see where ART pills are available.',
+      availabilityClinicLabel: 'Clinic',
+      availabilityToggle: 'Available now',
+      availabilityCount: 'People covered for 3 months',
+      availabilitySave: 'Save availability',
+      availabilitySaved: 'Availability updated.',
+      availabilityNeedClinic: 'Choose a clinic first to edit ART availability.',
+      availabilityQuickSet: 'Quick set',
       rankFootnote:
         'Score counts booking visits where the pill step is done or the visit is completed, then ratings—same ordering as the public home page.',
     },
@@ -467,6 +480,9 @@ export const translations = {
         'ဤစာလုံးနှင့် ကိုက်ညီသော ဆေးခန်းမရှိသေးပါ။ အခြားစာလုံး စမ်းပါ သို့မဟုတ် အကွက်ကို ရှင်းပြီး စာရင်းအားလုံး ကြည့်ပါ။',
       verified: 'အတည်ပြုပြီး',
       visitsLabel: 'ပြီးမြောက်သော လည်ပတ်မှုများ',
+      artAvailable: 'ART ဆေး ရရှိနိုင်',
+      artUnavailable: 'ART ဆေး မလုံလောက်/မရှိ',
+      artCountLabel: '၃ လစာ လုံလောက်မည့် လူဦးရေ',
       viewMap: 'မြေပုံနှင့် လည်ပတ်မှု',
       mapSignInHint:
         'မြေပုံကိုဖွင့်ရန်၊ ဆေးခန်းသိသော တောင်းဆိုမှုပို့ရန် သို့မဟုတ် ကိုယ်ပိုင် လည်ပတ်မှတ်တမ်းသိမ်းရန် ကိုယ်ရေးအချက်အလက်တွင် အမည်ပြောင်ဖြင့် ဝင်ရောက်ပါ။',
@@ -619,6 +635,16 @@ export const translations = {
       presetCare: 'Preset: စောင့်ရှောက်မှု',
       rankSearchPh: 'အဆင့်ဇယားရှာရန်…',
       workflowSnapshot: 'လုပ်ငန်းစဉ် အကျဉ်းချုပ်',
+      availabilityTitle: 'ART ဆေးရရှိနိုင်မှု',
+      availabilityHint:
+        'အဖွဲ့ဝင်များ အလွယ်တကူ စစ်ဆေးနိုင်ရန် သင့်ဆေးခန်း၏ ART ဆေးလက်ကျန်ကို အမြဲ မွမ်းမံထားပါ။',
+      availabilityClinicLabel: 'ဆေးခန်း',
+      availabilityToggle: 'ယခု ရရှိနိုင်',
+      availabilityCount: '၃ လစာအတွက် ကာမိမည့် လူဦးရေ',
+      availabilitySave: 'ရရှိနိုင်မှု သိမ်းရန်',
+      availabilitySaved: 'ရရှိနိုင်မှု မွမ်းမံပြီးပါပြီ။',
+      availabilityNeedClinic: 'ART ရရှိနိုင်မှု ပြင်ရန် ပထမဦးစွာ ဆေးခန်းရွေးပါ။',
+      availabilityQuickSet: 'အမြန်ရွေးရန်',
       rankFootnote:
         'အမှတ်သည် ဆေးပေးသည့်အဆင့်ပြီးသော သို့မဟုတ် လည်ပတ်မှု ပြီးစီးသော တောင်းဆိုမှုများကို ရေတွက်ပြီး ကြယ်ပွင့်များဖြင့် စီထားသည်။',
     },

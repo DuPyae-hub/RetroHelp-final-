@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
 
     Route::middleware(['role:2,3', 'staff.approved'])->group(function (): void {
         Route::post('/resource-libraries', [ResourceLibraryController::class, 'store']);
+        Route::patch('/art-centers/{artCenter}/availability', [ArtCenterController::class, 'updateAvailability']);
 
         Route::patch('/bookings/{booking}/accept', [BookingController::class, 'accept']);
         Route::patch('/bookings/{booking}/pill-given', [BookingController::class, 'pillGiven']);

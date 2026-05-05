@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ArtCenter;
+use App\Support\RoleId;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class ArtCenterController extends Controller
 {
@@ -27,7 +29,10 @@ class ArtCenterController extends Controller
                 'art_centers.rating_avg',
                 'art_centers.total_reviews',
                 'art_centers.is_verified',
+                'art_centers.art_pills_available',
+                'art_centers.art_pills_count',
             ])
+            ->selectRaw('art_centers.art_pills_count as art_three_month_people_count')
             ->withCount([
                 'bookings as booking_pill_given_count' => static function ($q): void {
                     $q->whereIn('status', ['pill_given', 'completed']);
@@ -69,7 +74,10 @@ class ArtCenterController extends Controller
                 'art_centers.is_verified',
                 'art_centers.rating_avg',
                 'art_centers.total_reviews',
+                'art_centers.art_pills_available',
+                'art_centers.art_pills_count',
             ])
+            ->selectRaw('art_centers.art_pills_count as art_three_month_people_count')
             ->withCount([
                 'bookings as completed_bookings_count' => static function ($q): void {
                     $q->where('status', 'completed');
@@ -110,6 +118,48 @@ class ArtCenterController extends Controller
                 'latitude' => $artCenter->latitude,
                 'longitude' => $artCenter->longitude,
                 'is_verified' => (bool) $artCenter->is_verified,
+                'art_pills_available' => (bool) $artCenter->art_pills_available,
+                'art_pills_count' => (int) ($artCenter->art_pills_count ?? 0),
+                'art_three_month_people_count' => (int) ($artCenter->art_pills_count ?? 0),
+            ],
+        ]);
+    }
+
+    public function updateAvailability(Request $request, ArtCenter $artCenter): JsonResponse
+    {
+        $user = $request->user();
+        if ($user === null) {
+            abort(Response::HTTP_UNAUTHORIZED);
+        }
+
+        $isAdmin = (int) $user->role_id === RoleId::Admin;
+        $isClinicStaff = (int) $user->role_id === RoleId::ClinicStaff;
+        if (! $isAdmin && ! ($isClinicStaff && (int) $user->art_center_id === (int) $artCenter->id)) {
+            abort(Response::HTTP_FORBIDDEN, 'You can only update availability for your own clinic.');
+        }
+
+        $payload = $request->validate([
+            'art_pills_available' => ['required', 'boolean'],
+            'art_pills_count' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+            'art_three_month_people_count' => ['nullable', 'integer', 'min:0', 'max:1000000'],
+        ]);
+
+        $isAvailable = (bool) $payload['art_pills_available'];
+        $requestedCount = $payload['art_three_month_people_count'] ?? $payload['art_pills_count'] ?? 0;
+        $count = $isAvailable ? (int) $requestedCount : 0;
+
+        $artCenter->forceFill([
+            'art_pills_available' => $isAvailable,
+            'art_pills_count' => $count,
+        ])->save();
+
+        return response()->json([
+            'message' => 'ART pill availability updated.',
+            'data' => [
+                'id' => $artCenter->id,
+                'art_pills_available' => (bool) $artCenter->art_pills_available,
+                'art_pills_count' => (int) ($artCenter->art_pills_count ?? 0),
+                'art_three_month_people_count' => (int) ($artCenter->art_pills_count ?? 0),
             ],
         ]);
     }

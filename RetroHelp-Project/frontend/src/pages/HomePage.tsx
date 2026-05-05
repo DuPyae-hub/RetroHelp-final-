@@ -364,6 +364,29 @@ export function HomePage() {
                       <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-semibold text-orange-900">
                         Visits: {c.booking_pill_given_count ?? 0}
                       </span>
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${
+                          c.art_pills_available
+                            ? 'bg-emerald-100 text-emerald-900'
+                            : 'bg-rose-100 text-rose-800'
+                        }`}
+                      >
+                        {c.art_pills_available ? t.findClinic.artAvailable : t.findClinic.artUnavailable}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex items-center justify-between rounded-2xl border border-teal-100 bg-teal-50/70 px-3 py-2">
+                      <span className="text-xs font-semibold text-teal-900">{t.findClinic.artCountLabel}</span>
+                      <motion.span
+                        key={`home-pill-${c.id}-${c.art_pills_count ?? 0}`}
+                        initial={{ scale: 0.9, opacity: 0.55 }}
+                        animate={{ scale: [0.95, 1.08, 1], opacity: 1 }}
+                        transition={{ duration: 0.6 }}
+                        className="text-lg font-extrabold text-teal-950 tabular-nums"
+                      >
+                        {c.art_pills_available
+                          ? c.art_three_month_people_count ?? c.art_pills_count ?? 0
+                          : 0}
+                      </motion.span>
                     </div>
                     <p className="mt-4 text-sm text-stone-700">
                       <span className="text-amber-500" aria-hidden>

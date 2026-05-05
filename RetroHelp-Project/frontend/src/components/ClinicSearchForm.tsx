@@ -280,6 +280,22 @@ export function ClinicSearchForm({
                     {c.completed_bookings_count ?? 0}
                   </span>
                 </p>
+                <div className="mt-2 flex items-center justify-between rounded-2xl border border-teal-100 bg-teal-50/70 px-3 py-2">
+                  <span className="text-xs font-semibold text-teal-900">
+                    {c.art_pills_available ? t.findClinic.artAvailable : t.findClinic.artUnavailable}
+                  </span>
+                  <motion.span
+                    key={`${c.id}-${c.art_pills_count ?? 0}`}
+                    initial={{ scale: 0.88, opacity: 0.5 }}
+                    animate={{ scale: [0.95, 1.08, 1], opacity: 1 }}
+                    transition={{ duration: 0.55 }}
+                    className="rounded-full bg-white px-2.5 py-0.5 text-sm font-extrabold text-teal-900 tabular-nums"
+                  >
+                    {c.art_pills_available
+                      ? c.art_three_month_people_count ?? c.art_pills_count ?? 0
+                      : 0}
+                  </motion.span>
+                </div>
                 <button
                   type="button"
                   onClick={() => void openCenter(c.id)}
@@ -322,6 +338,23 @@ export function ClinicSearchForm({
               <h3 className="text-lg font-bold text-stone-900">
                 {t.findClinic.mapTitle}: {detail.name}
               </h3>
+              <div className="flex items-center justify-between rounded-2xl border border-teal-100 bg-teal-50/80 px-4 py-2.5">
+                <p className="text-sm font-semibold text-teal-900">
+                  {detail.art_pills_available ? t.findClinic.artAvailable : t.findClinic.artUnavailable}
+                </p>
+                <motion.p
+                  key={`detail-pill-${detail.id}-${detail.art_pills_count ?? 0}`}
+                  initial={{ scale: 0.9, opacity: 0.5 }}
+                  animate={{ scale: [0.95, 1.1, 1], opacity: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="text-base font-extrabold text-teal-950 tabular-nums"
+                >
+                  {t.findClinic.artCountLabel}:{' '}
+                  {detail.art_pills_available
+                    ? detail.art_three_month_people_count ?? detail.art_pills_count ?? 0
+                    : 0}
+                </motion.p>
+              </div>
               <div className="overflow-hidden rounded-2xl border border-orange-100/80 bg-orange-50/40">
                 {detail.image ? (
                   <img
