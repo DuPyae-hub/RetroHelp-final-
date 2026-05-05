@@ -10,6 +10,8 @@ export type ResourceLibraryItem = {
 export type TopRankedClinic = {
   id: number
   name: string
+  nickname?: string | null
+  image?: string | null
   township: string | null
   area: string | null
   rating_avg: string | number | null
@@ -18,10 +20,17 @@ export type TopRankedClinic = {
   booking_pill_given_count?: number
 }
 
+export type HomeOverviewStats = {
+  users_count: number
+  pill_given_count: number
+  clinics_count: number
+}
+
 export type ArtCenterSearchItem = {
   id: number
   name: string
   nickname?: string | null
+  image?: string | null
   township: string | null
   area: string | null
   is_verified: boolean
@@ -35,6 +44,7 @@ export type ArtCenterDetail = {
   name: string
   township: string | null
   area: string | null
+  image?: string | null
   latitude: string | number | null
   longitude: string | number | null
   is_verified: boolean

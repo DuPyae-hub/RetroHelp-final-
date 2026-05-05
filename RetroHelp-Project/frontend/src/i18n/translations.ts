@@ -21,6 +21,9 @@ export const translations = {
       titleMy: 'သင်တစ်ယောက်တည်းမဟုတ်ပါ',
       subtitle:
         'Warm, confidential support for community members navigating care, clinics, and everyday questions.',
+      usersCountLabel: 'Community members',
+      pillsCountLabel: 'Pill-given updates',
+      clinicsCountLabel: 'Clinics listed',
       cta: 'Find ART Center',
       ctaSupport: 'Quick Support Chat',
       confidenceTitle: 'Why you can trust RetroHelp',
@@ -51,13 +54,16 @@ export const translations = {
     findClinic: {
       title: 'Find a clinic',
       description:
-        'Search by keyword (name, township, or area text in the listing). Listings are ranked by completed visits from community members—without exposing personal details.',
+        'Type one keyword to find a clinic fast. Open map directions, request a visit, or save a private route log.',
       submit: 'Search clinics',
       clinicsHeading: 'Clinics in the directory',
       clinicsSub:
         'We load centres here automatically. Enter a keyword and tap Search, or browse the full list.',
       searchKeyword: 'Keyword (clinic name or place)',
       searchKeywordPh: 'Type part of a name or place…',
+      chipSearch: 'Smart keyword search',
+      chipVerified: 'Verified clinics first',
+      chipMaps: 'One-tap map links',
       loading: 'Searching…',
       empty: 'No clinics match that keyword yet. Try another search or clear the box to see all.',
       verified: 'Verified',
@@ -69,6 +75,13 @@ export const translations = {
       noCoords:
         'This listing has no map coordinates yet. You can still record your visit for your records.',
       directionsIntro: 'Turn-by-turn directions in your maps app:',
+      siteDirectionsTitle: 'Get directions inside this page',
+      siteDirectionsHint:
+        'Tap "Use my location" to draw a live route line from your current location to this clinic.',
+      useMyLocation: 'Use my location',
+      locating: 'Getting location…',
+      locationDenied: 'Location permission was denied. Please allow location access and try again.',
+      locationUnsupported: 'This browser does not support live location.',
       openGoogleMaps: 'Open in Google Maps',
       openAppleMaps: 'Open in Apple Maps',
       actionsIntro:
@@ -90,11 +103,14 @@ export const translations = {
     library: {
       title: 'Resource library',
       description:
-        'Trusted basics and care tips. Content is for education only—always follow your care team’s guidance. Rows in phpMyAdmin should use category Basics or Care (any letter case); other categories appear under More topics.',
+        'Short, practical reads for daily care and emotional support. Education only—follow your care team for personal treatment decisions.',
       basics: 'Basics',
       care: 'Care',
       other: 'More topics',
       loading: 'Loading articles…',
+      chipShort: 'Bite-size articles',
+      chipCategories: 'Basics + Care',
+      chipQuickRead: 'Quick-read cards',
       emptyBasics: 'No basics articles yet.',
       emptyCare: 'No care articles yet.',
       emptyOther: 'No additional articles.',
@@ -142,6 +158,12 @@ export const translations = {
       verifyCenterBtn: 'Mark verified',
       verifyCenterOk: 'Listing verified. It can now appear as verified where supported.',
       approveStaffOk: 'Staff member approved.',
+      quickOverview: 'Operations overview',
+      quickOverviewSub: 'Live platform totals and booking mix',
+      quickPendingStaff: 'Pending staff approvals',
+      quickPendingClinics: 'Pending clinic verifications',
+      searchStaffPh: 'Search staff name…',
+      searchClinicPh: 'Search clinic / location…',
     },
     staffDash: {
       title: 'Staff dashboard',
@@ -188,6 +210,16 @@ export const translations = {
       rankClinic: 'Clinic',
       rankTownship: 'Location',
       rankScore: 'Visit-flow score',
+      kpiTotal: 'Total requests',
+      kpiPending: 'Need response',
+      kpiInProgress: 'In progress',
+      kpiDone: 'Completed flow',
+      searchLabel: 'Quick search',
+      searchPh: 'Member, clinic, or note…',
+      presetBasics: 'Preset: Basics',
+      presetCare: 'Preset: Care',
+      rankSearchPh: 'Search ranking table…',
+      workflowSnapshot: 'Workflow snapshot',
       rankFootnote:
         'Score counts booking visits where the pill step is done or the visit is completed, then ratings—same ordering as the public home page.',
     },
@@ -387,6 +419,9 @@ export const translations = {
       titleMy: 'သင်တစ်ယောက်တည်းမဟုတ်ပါ',
       subtitle:
         'စောင့်ရှောက်မှု၊ ဆေးခန်းများနှင့် နေ့စဉ်မေးခွန်းများအတွက် လျှို့ဝှက်စွာ၊ နွေးထွေးသော အကူအညီ။',
+      usersCountLabel: 'အသုံးပြုသူများ',
+      pillsCountLabel: 'ဆေးပေးပြီး မှတ်တမ်းများ',
+      clinicsCountLabel: 'စာရင်းဝင် ဆေးခန်းများ',
       cta: 'ART စင်တာရှာရန်',
       ctaSupport: 'အမြန်စကားပြောအကူအညီ',
       confidenceTitle: 'RetroHelp ကို ယုံကြည်ရခြင်း',
@@ -417,13 +452,16 @@ export const translations = {
     findClinic: {
       title: 'ဆေးခန်းရှာရန်',
       description:
-        'စာလုံးဖြင့် ရှာဖွေနိုင်ပါသည် (အမည်၊ စာရင်းထဲက မြို့နယ် သို့မဟုတ် နယ်မြေစာသား)။ အဖွဲ့ဝင်များ၏ ပြီးမြောက်သော လည်ပတ်မှုအရ စာရင်းပြုလုပ်ထားပြီး ကိုယ်ရေးကိုယ်တာကို မထုတ်ဖော်ပါ။',
+        'စာလုံးတစ်ခုတည်းနဲ့ မြန်မြန်ရှာပါ။ မြေပုံလမ်းညွှန်ဖွင့်ရန်၊ လာရောက်တောင်းဆိုရန် သို့မဟုတ် ကိုယ်ပိုင် လမ်းကြောင်းမှတ်တမ်း သိမ်းနိုင်ပါသည်။',
       submit: 'ဆေးခန်းရှာရန်',
       clinicsHeading: 'စာရင်းတွင်ပါသော ဆေးခန်းများ',
       clinicsSub:
         'ဤနေရာတွင် စင်တာများကို အလိုအလျောက် ဖော်ပြပါသည်။ စာလုံး ရိုက်ပြီး ရှာဖွေပါ သို့မဟုတ် စာရင်းအားလုံးကို ကြည့်ရှုပါ။',
       searchKeyword: 'စာလုံး (ဆေးခန်းအမည် သို့မဟုတ် နေရာ)',
       searchKeywordPh: 'အမည် သို့မဟုတ် နေရာအစိတ်အပိုင်း ရိုက်ပါ…',
+      chipSearch: 'စမတ်စာလုံးရှာဖွေမှု',
+      chipVerified: 'အတည်ပြုဆေးခန်းများကို ဦးစားပေး',
+      chipMaps: 'မြေပုံလင့်ခ် အမြန်ဖွင့်',
       loading: 'ရှာဖွေနေသည်…',
       empty:
         'ဤစာလုံးနှင့် ကိုက်ညီသော ဆေးခန်းမရှိသေးပါ။ အခြားစာလုံး စမ်းပါ သို့မဟုတ် အကွက်ကို ရှင်းပြီး စာရင်းအားလုံး ကြည့်ပါ။',
@@ -436,6 +474,13 @@ export const translations = {
       noCoords:
         'ဤစာရင်းတွင် မြေပုံကိုဩဒိနိတ်မရှိသေးပါ။ မှတ်တမ်းတင်ခြင်းကို ဆက်လုပ်နိုင်ပါသည်။',
       directionsIntro: 'မြေပုံအက်ပ်တွင် လမ်းညွှန်ချက်များ ဖွင့်ရန်။',
+      siteDirectionsTitle: 'ဤစာမျက်နှာပေါ်တွင် တိုက်ရိုက်လမ်းညွှန်',
+      siteDirectionsHint:
+        '"ကျွန်ုပ်တည်နေရာသုံးရန်" ကိုနှိပ်ပါက သင့်တည်နေရာမှ ဤဆေးခန်းသို့ လမ်းကြောင်းလိုင်းကို တိုက်ရိုက်ပြပါမည်။',
+      useMyLocation: 'ကျွန်ုပ်တည်နေရာ သုံးရန်',
+      locating: 'တည်နေရာ ရယူနေသည်…',
+      locationDenied: 'တည်နေရာခွင့်ပြုချက် မရပါ။ ခွင့်ပြုပြီး ထပ်စမ်းပါ။',
+      locationUnsupported: 'ဤဘရောက်ဇာတွင် တည်နေရာတိုက်ရိုက် မထောက်ပံ့ပါ။',
       openGoogleMaps: 'Google Maps တွင် ဖွင့်ရန်',
       openAppleMaps: 'Apple Maps တွင် ဖွင့်ရန်',
       actionsIntro:
@@ -457,11 +502,14 @@ export const translations = {
     library: {
       title: 'လေ့လာရေးစာကြည့်တိုက်',
       description:
-        'ယုံကြည်စိတ်ချရသော အခြေခံဗဟုသုတနှင့် စောင့်ရှောက်မှု အကြံပြုချက်များ။ ပညာရေးအတွက်သာ—သင့်စောင့်ရှောက်ရေးအဖွဲ့၏ လမ်းညွှန်ချက်များကို အမြဲလိုက်နာပါ။ phpMyAdmin တွင် category အက္ခရာအမျိုးအစား မတူညီစေဘဲ Basics သို့မဟုတ် Care ဟု ထည့်ပါ။ အခြားအမျိုးအစားများကို နောက်ထပ် ခေါင်းစဉ်အောက်တွင် ပြပါသည်။',
+        'နေ့စဉ်စောင့်ရှောက်မှုနဲ့ စိတ်ပိုင်းဆိုင်ရာ ပံ့ပိုးမှုအတွက် ဖတ်ရလွယ်သော အတိုချုံးဆောင်းပါးများ။ ပညာရေးအတွက်သာဖြစ်ပြီး ကိုယ်ပိုင်ကုသမှုအတွက် သင့်ကျန်းမာရေးအဖွဲ့ကို လိုက်နာပါ။',
       basics: 'အခြေခံဗဟုသုတ',
       care: 'စောင့်ရှောက်မှု',
       other: 'နောက်ထပ် ခေါင်းစဉ်များ',
       loading: 'ဆောင်းပါးများ ဖတ်နေသည်…',
+      chipShort: 'အတိုချုံးဆောင်းပါးများ',
+      chipCategories: 'အခြေခံ + စောင့်ရှောက်မှု',
+      chipQuickRead: 'အမြန်ဖတ်ကတ်များ',
       emptyBasics: 'အခြေခံဗဟုသုတ ဆောင်းပါးများ မရှိသေးပါ။',
       emptyCare: 'စောင့်ရှောက်မှု ဆောင်းပါးများ မရှိသေးပါ။',
       emptyOther: 'နောက်ထပ် ဆောင်းပါးများ မရှိသေးပါ။',
@@ -509,6 +557,12 @@ export const translations = {
       verifyCenterBtn: 'အတည်ပြုပြီး မှတ်ရန်',
       verifyCenterOk: 'စာရင်းကို အတည်ပြုပြီးပါပြီ။',
       approveStaffOk: 'ဝန်ထမ်းကို အတည်ပြုပြီးပါပြီ။',
+      quickOverview: 'လုပ်ငန်းဆောင်တာ အကျဉ်းချုပ်',
+      quickOverviewSub: 'ပလက်ဖောင်းစာရင်းနှင့် တောင်းဆိုမှုအမျိုးအစားများ',
+      quickPendingStaff: 'အတည်ပြုရန် ကျန်ဝန်ထမ်း',
+      quickPendingClinics: 'အတည်ပြုရန် ကျန်ဆေးခန်း',
+      searchStaffPh: 'ဝန်ထမ်းအမည်ဖြင့် ရှာပါ…',
+      searchClinicPh: 'ဆေးခန်း / နေရာ ရှာပါ…',
     },
     staffDash: {
       title: 'ဝန်ထမ်း ဒက်ရှ်ဘုတ်',
@@ -555,6 +609,16 @@ export const translations = {
       rankClinic: 'ဆေးခန်း',
       rankTownship: 'နေရာ',
       rankScore: 'လည်ပတ်မှု စီးဆင်းမှု အမှတ်',
+      kpiTotal: 'တောင်းဆိုမှု စုစုပေါင်း',
+      kpiPending: 'တုံ့ပြန်ရန် လိုအပ်',
+      kpiInProgress: 'လုပ်ဆောင်နေသည်',
+      kpiDone: 'ပြီးစီးသော လုပ်ငန်းစဉ်',
+      searchLabel: 'အမြန်ရှာဖွေ',
+      searchPh: 'အဖွဲ့ဝင်၊ ဆေးခန်း သို့မဟုတ် မှတ်ချက်…',
+      presetBasics: 'Preset: အခြေခံ',
+      presetCare: 'Preset: စောင့်ရှောက်မှု',
+      rankSearchPh: 'အဆင့်ဇယားရှာရန်…',
+      workflowSnapshot: 'လုပ်ငန်းစဉ် အကျဉ်းချုပ်',
       rankFootnote:
         'အမှတ်သည် ဆေးပေးသည့်အဆင့်ပြီးသော သို့မဟုတ် လည်ပတ်မှု ပြီးစီးသော တောင်းဆိုမှုများကို ရေတွက်ပြီး ကြယ်ပွင့်များဖြင့် စီထားသည်။',
     },

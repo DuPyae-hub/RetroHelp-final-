@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../api/client'
 import { AnimatedClinicMascot, AnimatedLibraryMascot } from '../components/AnimatedSectionMascots'
+import { BookingStatusMascot } from '../components/BookingStatusMascot'
 import { useSupportOpener } from '../context/SupportOpenerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import {
@@ -15,13 +16,18 @@ import {
   staggerItem,
 } from '../lib/motionPresets'
 import { partitionResourceLibrary } from '../lib/resourceLibraryCategory'
-import type { ResourceLibraryItem, TopRankedClinic } from '../types/api'
+import type { HomeOverviewStats, ResourceLibraryItem, TopRankedClinic } from '../types/api'
 
 function formatRating(avg: string | number | null | undefined): string {
   if (avg === null || avg === undefined || avg === '') return '—'
   const n = typeof avg === 'number' ? avg : Number.parseFloat(String(avg))
   if (!Number.isFinite(n)) return '—'
   return n.toFixed(1)
+}
+
+function formatCount(value: number | null): string {
+  if (value === null) return '...'
+  return new Intl.NumberFormat().format(value)
 }
 
 export function HomePage() {
@@ -32,13 +38,14 @@ export function HomePage() {
   const [library, setLibrary] = useState<ResourceLibraryItem[] | null>(null)
   const [libraryError, setLibraryError] = useState<string | null>(null)
   const [article, setArticle] = useState<ResourceLibraryItem | null>(null)
+  const [overview, setOverview] = useState<HomeOverviewStats | null>(null)
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
         const { data } = await api.get<{ data: TopRankedClinic[] }>(
-          '/api/art-centers/top-ranked?limit=12',
+          '/api/art-centers/top-ranked?limit=3',
         )
         if (!cancelled) {
           const rows = Array.isArray(data?.data) ? data.data : []
@@ -50,6 +57,21 @@ export function HomePage() {
           setClinicsError(getApiErrorMessage(e))
           setClinics([])
         }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data } = await api.get<{ data: HomeOverviewStats }>('/api/overview/public')
+        if (!cancelled && data?.data) setOverview(data.data)
+      } catch {
+        if (!cancelled) setOverview(null)
       }
     })()
     return () => {
@@ -100,24 +122,6 @@ export function HomePage() {
       document.body.style.overflow = prev
     }
   }, [article, onKeyModal])
-
-  const confidence = [
-    {
-      title: t.home.confidence1Title,
-      body: t.home.confidence1Body,
-      icon: '🔒',
-    },
-    {
-      title: t.home.confidence2Title,
-      body: t.home.confidence2Body,
-      icon: '✓',
-    },
-    {
-      title: t.home.confidence3Title,
-      body: t.home.confidence3Body,
-      icon: '☀️',
-    },
-  ] as const
 
   return (
     <div className="bg-stone-50">
@@ -210,17 +214,36 @@ export function HomePage() {
               {t.home.confidenceTitle}
             </motion.h2>
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {confidence.map((card) => (
               <motion.article
-                key={card.title}
                 variants={staggerItem}
                 className={`${glassPanel} p-8 lg:p-9`}
               >
-                <div className="mb-4 text-3xl">{card.icon}</div>
-                <h3 className="text-lg font-bold text-stone-900">{card.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-stone-600">{card.body}</p>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <BookingStatusMascot status="accepted" size={62} aria-label={t.home.usersCountLabel} />
+                  <p className="text-3xl font-extrabold text-stone-900 tabular-nums">
+                    {formatCount(overview?.users_count ?? null)}
+                  </p>
+                </div>
+                <h3 className="text-lg font-bold text-stone-900">{t.home.usersCountLabel}</h3>
               </motion.article>
-            ))}
+              <motion.article variants={staggerItem} className={`${glassPanel} p-8 lg:p-9`}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <AnimatedLibraryMascot className="h-16 w-16" />
+                  <p className="text-3xl font-extrabold text-stone-900 tabular-nums">
+                    {formatCount(overview?.pill_given_count ?? null)}
+                  </p>
+                </div>
+                <h3 className="text-lg font-bold text-stone-900">{t.home.pillsCountLabel}</h3>
+              </motion.article>
+              <motion.article variants={staggerItem} className={`${glassPanel} p-8 lg:p-9`}>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <AnimatedClinicMascot className="h-16 w-16" />
+                  <p className="text-3xl font-extrabold text-stone-900 tabular-nums">
+                    {formatCount(overview?.clinics_count ?? null)}
+                  </p>
+                </div>
+                <h3 className="text-lg font-bold text-stone-900">{t.home.clinicsCountLabel}</h3>
+              </motion.article>
             </div>
           </motion.div>
         </section>
@@ -277,18 +300,53 @@ export function HomePage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: '-24px' }}
-                className="grid auto-rows-fr grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12"
               >
                 {clinics.map((c, i) => (
                   <motion.article
                     key={c.id}
                     variants={staggerItem}
-                    className={`${glassPanel} flex flex-col p-6 sm:p-7 ${
-                      i === 0 ? 'sm:col-span-2 sm:min-h-[13rem]' : ''
+                    className={`${glassPanel} flex flex-col p-5 sm:p-6 ${
+                      i === 0
+                        ? 'sm:col-span-2 lg:col-span-7'
+                        : i === 1 || i === 2
+                          ? 'lg:col-span-5'
+                          : 'lg:col-span-4'
                     }`}
                   >
+                    <div className="mb-4 overflow-hidden rounded-2xl border border-orange-100/70 bg-orange-50/50">
+                      {c.image ? (
+                        <img
+                          src={c.image}
+                          alt={c.name}
+                          className={`w-full object-cover ${
+                            i === 0 ? 'h-40 sm:h-44' : 'h-24 sm:h-28'
+                          }`}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none'
+                            const fallback = e.currentTarget.nextElementSibling as HTMLDivElement | null
+                            if (fallback) fallback.style.display = 'flex'
+                          }}
+                        />
+                      ) : null}
+                      <div
+                        className={`${
+                          c.image ? 'hidden' : 'flex'
+                        } w-full items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 ${
+                          i === 0 ? 'h-40 sm:h-44' : 'h-24 sm:h-28'
+                        }`}
+                      >
+                        <div className="rounded-2xl border border-white/70 bg-white/70 px-4 py-2 text-center backdrop-blur">
+                          <p className="text-xl">🏥</p>
+                          <p className="text-xs font-semibold text-stone-700">Clinic image unavailable</p>
+                        </div>
+                      </div>
+                    </div>
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="text-lg font-bold text-stone-900 sm:text-xl">{c.name}</h3>
+                      <h3 className={`${i === 0 ? 'text-xl sm:text-2xl' : 'text-lg'} font-bold text-stone-900`}>
+                        {c.name}
+                      </h3>
                       {c.is_verified && (
                         <span className="shrink-0 rounded-full bg-teal-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-900 backdrop-blur-sm">
                           {t.findClinic.verified}
@@ -298,6 +356,19 @@ export function HomePage() {
                     <p className="mt-2 text-sm text-stone-600">
                       {[c.township, c.area].filter(Boolean).join(' · ') || '—'}
                     </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-stone-100 px-2.5 py-1 text-[11px] font-semibold text-stone-700">
+                        ID: #{c.id}
+                      </span>
+                      {c.nickname ? (
+                        <span className="rounded-full bg-teal-100 px-2.5 py-1 text-[11px] font-semibold text-teal-800">
+                          @{c.nickname}
+                        </span>
+                      ) : null}
+                      <span className="rounded-full bg-orange-100 px-2.5 py-1 text-[11px] font-semibold text-orange-900">
+                        Visits: {c.booking_pill_given_count ?? 0}
+                      </span>
+                    </div>
                     <p className="mt-4 text-sm text-stone-700">
                       <span className="text-amber-500" aria-hidden>
                         ★
@@ -310,10 +381,12 @@ export function HomePage() {
                         </span>
                       ) : null}
                     </p>
-                    <div className="mt-auto pt-5">
+                    <div className="pt-3">
                       <Link
                         to={`/find-clinic?center=${c.id}`}
-                        className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30"
+                        className={`flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 ${
+                          i === 0 ? 'py-3.5 text-base' : 'py-3 text-sm'
+                        } font-semibold text-white shadow-lg shadow-teal-900/30`}
                       >
                         {t.home.viewDirections}
                       </Link>

@@ -19,6 +19,7 @@ class AdminArtCentersController extends Controller
                 'id',
                 'name',
                 'nickname',
+                'image',
                 'township',
                 'area',
                 'contact_no',

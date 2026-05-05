@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import { BookingStatusMascot } from '../components/BookingStatusMascot'
 import { api, getApiErrorMessage } from '../api/client'
@@ -31,6 +31,50 @@ type StaffBookingRow = {
   art_center?: { id: number; name: string; township: string | null; area: string | null } | null
 }
 
+function DonutChart({
+  slices,
+}: {
+  slices: { value: number; color: string; label: string }[]
+}) {
+  const total = Math.max(1, slices.reduce((sum, s) => sum + s.value, 0))
+  const r = 44
+  const c = 2 * Math.PI * r
+  let offset = 0
+
+  return (
+    <svg viewBox="0 0 120 120" className="h-28 w-28">
+      <circle cx="60" cy="60" r={r} fill="none" stroke="#e7e5e4" strokeWidth="14" />
+      {slices.map((s) => {
+        const len = (s.value / total) * c
+        const el = (
+          <circle
+            key={s.label}
+            cx="60"
+            cy="60"
+            r={r}
+            fill="none"
+            stroke={s.color}
+            strokeWidth="14"
+            strokeDasharray={`${len} ${Math.max(0, c - len)}`}
+            strokeDashoffset={-offset}
+            strokeLinecap="butt"
+            transform="rotate(-90 60 60)"
+          />
+        )
+        offset += len
+        return el
+      })}
+      <circle cx="60" cy="60" r="27" fill="#fff" />
+      <text x="60" y="56" textAnchor="middle" className="fill-stone-500 text-[9px] font-semibold">
+        TOTAL
+      </text>
+      <text x="60" y="72" textAnchor="middle" className="fill-stone-900 text-[16px] font-extrabold">
+        {slices.reduce((sum, s) => sum + s.value, 0)}
+      </text>
+    </svg>
+  )
+}
+
 export function StaffDashboardPage() {
   const { user, loading: authLoading } = useAuth()
   const { t } = useLanguage()
@@ -43,10 +87,12 @@ export function StaffDashboardPage() {
   const [adminCenterId, setAdminCenterId] = useState<number | null>(null)
   const [centersForAdmin, setCentersForAdmin] = useState<ArtCenterSearchItem[]>([])
   const [busyBookingId, setBusyBookingId] = useState<number | null>(null)
+  const [bookingSearch, setBookingSearch] = useState('')
 
   const [rankRows, setRankRows] = useState<TopRankedClinic[]>([])
   const [rankLoading, setRankLoading] = useState(false)
   const [rankError, setRankError] = useState<string | null>(null)
+  const [rankSearch, setRankSearch] = useState('')
 
   const [articleTitle, setArticleTitle] = useState('')
   const [articleBody, setArticleBody] = useState('')
@@ -177,6 +223,49 @@ export function StaffDashboardPage() {
     }
   }
 
+  const bookingSummary = useMemo(() => {
+    const byStatus = bookings.reduce<Record<string, number>>((acc, b) => {
+      acc[b.status] = (acc[b.status] ?? 0) + 1
+      return acc
+    }, {})
+    return {
+      total: bookings.length,
+      pending: (byStatus.requested ?? 0) + (byStatus.accepted ?? 0),
+      inProgress: (byStatus.on_my_way ?? 0) + (byStatus.arrived ?? 0),
+      done: (byStatus.pill_given ?? 0) + (byStatus.completed ?? 0),
+    }
+  }, [bookings])
+
+  const filteredBookings = useMemo(() => {
+    const q = bookingSearch.trim().toLowerCase()
+    if (!q) return bookings
+    return bookings.filter((b) => {
+      const patient = patientDisplay(b).toLowerCase()
+      const center = (b.art_center?.name ?? '').toLowerCase()
+      const note = (b.patient_note ?? '').toLowerCase()
+      return patient.includes(q) || center.includes(q) || note.includes(q)
+    })
+  }, [bookingSearch, bookings])
+
+  const filteredRankRows = useMemo(() => {
+    const q = rankSearch.trim().toLowerCase()
+    if (!q) return rankRows
+    return rankRows.filter((r) =>
+      [r.name, r.township, r.area].filter(Boolean).join(' ').toLowerCase().includes(q),
+    )
+  }, [rankRows, rankSearch])
+
+  const adminClinicBreakdown = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const b of bookings) {
+      const name = b.art_center?.name ?? `#${b.art_center_id}`
+      counts.set(name, (counts.get(name) ?? 0) + 1)
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+  }, [bookings])
+
   if (authLoading) {
     return (
       <motion.div
@@ -200,7 +289,7 @@ export function StaffDashboardPage() {
   const scoreCell = (r: TopRankedClinic) => r.booking_pill_given_count ?? 0
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-100 via-orange-50/35 to-teal-50/40">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(13,148,136,0.16),transparent_35%),linear-gradient(to_bottom_right,#f5f5f4,rgba(254,215,170,0.35),rgba(204,251,241,0.45))]">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
         <motion.div
           variants={staggerContainer}
@@ -208,7 +297,10 @@ export function StaffDashboardPage() {
           animate="visible"
           className="grid gap-5 lg:grid-cols-12"
         >
-          <motion.header variants={staggerItem} className={`lg:col-span-12 ${glassPanel} p-6 sm:p-8`}>
+          <motion.header variants={staggerItem} className={`lg:col-span-12 border-teal-300/45 ${glassPanel} p-6 sm:p-8`}>
+            <p className="mb-2 inline-flex rounded-full border border-teal-300/50 bg-teal-50/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-teal-900">
+              Staff Operations Console
+            </p>
             <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
               {t.staffDash.title}
             </h1>
@@ -231,12 +323,42 @@ export function StaffDashboardPage() {
               </button>
             ))}
           </motion.div>
+          <motion.div
+            variants={staggerItem}
+            className="grid gap-4 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-4"
+          >
+            <div className={`${glassPanel} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-teal-800">{t.staffDash.kpiTotal}</p>
+              <p className="mt-1 text-2xl font-extrabold text-stone-900 tabular-nums">{bookingSummary.total}</p>
+            </div>
+            <div className={`${glassPanel} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">{t.staffDash.kpiPending}</p>
+              <p className="mt-1 text-2xl font-extrabold text-stone-900 tabular-nums">{bookingSummary.pending}</p>
+            </div>
+            <div className={`${glassPanel} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-sky-800">{t.staffDash.kpiInProgress}</p>
+              <p className="mt-1 text-2xl font-extrabold text-stone-900 tabular-nums">{bookingSummary.inProgress}</p>
+            </div>
+            <div className={`${glassPanel} p-4`}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">{t.staffDash.kpiDone}</p>
+              <p className="mt-1 text-2xl font-extrabold text-stone-900 tabular-nums">{bookingSummary.done}</p>
+            </div>
+          </motion.div>
 
           {tab === 'bookings' && (
             <motion.div variants={staggerItem} className="space-y-5 lg:col-span-12">
               <div className="grid gap-5 lg:grid-cols-12">
                 <div className={`flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between lg:col-span-5 ${glassPanel} p-5 sm:p-6`}>
                   <div className="flex flex-wrap items-end gap-3">
+                    <label className="block min-w-[13rem] text-sm font-semibold text-stone-800">
+                      <span className="mb-1 block">{t.staffDash.searchLabel}</span>
+                      <input
+                        value={bookingSearch}
+                        onChange={(e) => setBookingSearch(e.target.value)}
+                        placeholder={t.staffDash.searchPh}
+                        className="w-full rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-sm text-stone-900 backdrop-blur-md"
+                      />
+                    </label>
                     <label className="block text-sm font-semibold text-stone-800">
                       <span className="mb-1 block">{t.staffDash.statusFilter}</span>
                       <select
@@ -303,9 +425,57 @@ export function StaffDashboardPage() {
                       </p>
                     </div>
                   ) : admin ? (
-                    <p className="text-sm leading-relaxed text-stone-600">
-                      {t.staffDash.adminCenterFilter} — {t.staffDash.adminAllCenters}
-                    </p>
+                    <div className="space-y-3">
+                      <p className="text-sm leading-relaxed text-stone-600">
+                        {t.staffDash.adminCenterFilter} — {t.staffDash.adminAllCenters}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-semibold text-stone-700">
+                          Clinics loaded: {centersForAdmin.length}
+                        </span>
+                        <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-800">
+                          Current filter: {adminCenterId === null ? t.staffDash.adminAllCenters : `#${adminCenterId}`}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStatusFilter('requested')
+                            setAdminCenterId(null)
+                          }}
+                          className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-900 transition hover:bg-amber-100"
+                        >
+                          Quick: Requested only
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setStatusFilter('')
+                            setBookingSearch('')
+                            setAdminCenterId(null)
+                          }}
+                          className="rounded-xl border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-900 transition hover:bg-teal-100"
+                        >
+                          Clear filters
+                        </button>
+                      </div>
+                      {adminClinicBreakdown.length > 0 ? (
+                        <div className="rounded-2xl border border-white/60 bg-white/40 p-3 backdrop-blur">
+                          <p className="text-xs font-bold uppercase tracking-wide text-teal-800">
+                            Top busy clinics (current data)
+                          </p>
+                          <ul className="mt-2 space-y-1">
+                            {adminClinicBreakdown.map(([name, count]) => (
+                              <li key={name} className="flex items-center justify-between text-xs text-stone-700">
+                                <span className="truncate pr-3">{name}</span>
+                                <span className="font-bold tabular-nums">{count}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+                    </div>
                   ) : null}
                 </div>
               </div>
@@ -331,7 +501,7 @@ export function StaffDashboardPage() {
 
               {bookingsLoading ? (
                 <p className="text-stone-600">{t.staff.working}</p>
-              ) : bookings.length === 0 && !bookingsBlocked ? (
+              ) : filteredBookings.length === 0 && !bookingsBlocked ? (
                 <div className="grid gap-5 lg:grid-cols-12">
                   <div className={`lg:col-span-8 ${glassPanel} px-6 py-10 text-center text-stone-600`}>
                     {t.staffDash.bookingsEmpty}
@@ -372,7 +542,7 @@ export function StaffDashboardPage() {
                   animate="visible"
                   className="grid gap-4"
                 >
-                  {bookings.map((b) => (
+                  {filteredBookings.map((b) => (
                     <motion.li key={b.id} variants={staggerItem} className={`${glassPanel} p-5 sm:p-6`}>
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="flex min-w-0 flex-1 gap-3">
@@ -462,6 +632,22 @@ export function StaffDashboardPage() {
                   </p>
                 ) : null}
                 <form className="mt-6 space-y-4" onSubmit={(e) => void submitArticle(e)}>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setArticleCategory('Basics')}
+                      className="rounded-xl border border-teal-200 bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800"
+                    >
+                      {t.staffDash.presetBasics}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setArticleCategory('Care')}
+                      className="rounded-xl border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-semibold text-orange-800"
+                    >
+                      {t.staffDash.presetCare}
+                    </button>
+                  </div>
                   <label className="block text-sm font-semibold text-stone-800">
                     {t.staffDash.articleTitle}
                     <input
@@ -505,9 +691,31 @@ export function StaffDashboardPage() {
                 className={`flex flex-col justify-center ${glassPanel} p-6 sm:p-8 lg:col-span-5`}
               >
                 <p className="text-xs font-bold uppercase tracking-wide text-teal-800">
-                  {t.library.title}
+                  {t.staffDash.workflowSnapshot}
                 </p>
-                <p className="mt-3 text-sm leading-relaxed text-stone-600">{t.library.description}</p>
+                <div className="mt-4 flex items-center gap-4">
+                  <DonutChart
+                    slices={[
+                      { value: bookingSummary.pending, color: '#f59e0b', label: t.staffDash.kpiPending },
+                      { value: bookingSummary.inProgress, color: '#0ea5e9', label: t.staffDash.kpiInProgress },
+                      { value: bookingSummary.done, color: '#10b981', label: t.staffDash.kpiDone },
+                    ]}
+                  />
+                  <div className="space-y-2 text-xs text-stone-700">
+                    <p>
+                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-amber-500" />{' '}
+                      {t.staffDash.kpiPending}: <span className="font-bold">{bookingSummary.pending}</span>
+                    </p>
+                    <p>
+                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-sky-500" />{' '}
+                      {t.staffDash.kpiInProgress}: <span className="font-bold">{bookingSummary.inProgress}</span>
+                    </p>
+                    <p>
+                      <span className="inline-block h-2.5 w-2.5 rounded-full bg-emerald-500" />{' '}
+                      {t.staffDash.kpiDone}: <span className="font-bold">{bookingSummary.done}</span>
+                    </p>
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -521,7 +729,17 @@ export function StaffDashboardPage() {
               ) : null}
               {rankLoading ? (
                 <p className="text-stone-600">{t.home.clinicsLoading}</p>
-              ) : rankRows.length === 0 ? (
+              ) : (
+                <div className="mb-4">
+                  <input
+                    value={rankSearch}
+                    onChange={(e) => setRankSearch(e.target.value)}
+                    placeholder={t.staffDash.rankSearchPh}
+                    className="w-full max-w-sm rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-sm text-stone-900 backdrop-blur-md"
+                  />
+                </div>
+              )}
+              {!rankLoading && filteredRankRows.length === 0 ? (
                 <p className={`${glassPanel} px-6 py-10 text-stone-600`}>{t.home.clinicsEmpty}</p>
               ) : (
                 <div className={`overflow-x-auto ${glassPanel}`}>
@@ -536,7 +754,7 @@ export function StaffDashboardPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {rankRows.map((r, idx) => (
+                      {filteredRankRows.map((r, idx) => (
                         <tr
                           key={r.id}
                           className="border-b border-white/30 last:border-0 transition hover:bg-white/25"

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useCallback, useEffect, useState } from 'react'
 import { api, getApiErrorMessage } from '../api/client'
 import { useAuth } from '../context/AuthContext'
@@ -42,6 +42,10 @@ export function ClinicSearchForm({
   const [requestingBooking, setRequestingBooking] = useState(false)
   const [bookingMsg, setBookingMsg] = useState<string | null>(null)
   const [bookingOk, setBookingOk] = useState<boolean | null>(null)
+  const [detailOpen, setDetailOpen] = useState(false)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [locating, setLocating] = useState(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
 
   const isPatient = user && token && isCommunityMember(user.role_id)
 
@@ -85,6 +89,7 @@ export function ClinicSearchForm({
   const openCenter = useCallback(
     async (id: number) => {
       setSelectedId(id)
+      setDetailOpen(true)
       setDetail(null)
       setDetailError(null)
       setRecordMsg(null)
@@ -113,6 +118,35 @@ export function ClinicSearchForm({
     if (initialCenterId == null) return
     void openCenter(initialCenterId)
   }, [initialCenterId, openCenter])
+
+  useEffect(() => {
+    if (!detailOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setDetailOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [detailOpen])
+
+  const locateUser = () => {
+    if (!navigator.geolocation) {
+      setLocationError(t.findClinic.locationUnsupported)
+      return
+    }
+    setLocating(true)
+    setLocationError(null)
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setLocating(false)
+      },
+      () => {
+        setLocationError(t.findClinic.locationDenied)
+        setLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }
 
   const recordVisit = async () => {
     if (!selectedId || !isPatient) return
@@ -215,6 +249,20 @@ export function ClinicSearchForm({
                     : 'border-orange-100/90'
                 }`}
               >
+                <div className="mb-3 overflow-hidden rounded-2xl border border-orange-100/80 bg-orange-50/40">
+                  {c.image ? (
+                    <img
+                      src={c.image}
+                      alt={c.name}
+                      className="h-24 w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-24 items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 text-2xl">
+                      🏥
+                    </div>
+                  )}
+                </div>
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="text-lg font-bold text-stone-900">{c.name}</h3>
                   {c.is_verified && (
@@ -245,12 +293,22 @@ export function ClinicSearchForm({
         </ul>
       )}
 
-      {selectedId !== null && (
+      <AnimatePresence>
+      {selectedId !== null && detailOpen && (
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-3xl border border-orange-100/90 bg-white/90 p-5 shadow-xl shadow-teal-900/5 sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-end justify-center bg-stone-950/50 p-3 backdrop-blur-sm sm:items-center sm:p-6"
+          onClick={() => setDetailOpen(false)}
         >
+          <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.98 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 20, scale: 0.98 }}
+          className="max-h-[92vh] w-full max-w-5xl overflow-y-auto rounded-3xl border border-orange-100/90 bg-white/95 p-5 shadow-2xl shadow-teal-900/20 sm:p-6"
+          onClick={(e) => e.stopPropagation()}
+          >
           {!isPatient ? (
             <p className="text-sm leading-relaxed text-stone-600">
               {t.findClinic.mapSignInHint}
@@ -264,12 +322,43 @@ export function ClinicSearchForm({
               <h3 className="text-lg font-bold text-stone-900">
                 {t.findClinic.mapTitle}: {detail.name}
               </h3>
+              <div className="overflow-hidden rounded-2xl border border-orange-100/80 bg-orange-50/40">
+                {detail.image ? (
+                  <img
+                    src={detail.image}
+                    alt={detail.name}
+                    className="h-40 w-full object-cover sm:h-48"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="flex h-40 items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 text-4xl sm:h-48">
+                    🏥
+                  </div>
+                )}
+              </div>
               <ClinicMapPanel
                 name={detail.name}
                 latitude={parseCoord(detail.latitude)}
                 longitude={parseCoord(detail.longitude)}
                 noCoordsLabel={t.findClinic.noCoords}
+                userLatitude={userLocation?.lat ?? null}
+                userLongitude={userLocation?.lng ?? null}
               />
+              <div className="rounded-2xl border border-teal-100/90 bg-teal-50/45 p-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm font-semibold text-teal-950">{t.findClinic.siteDirectionsTitle}</p>
+                  <button
+                    type="button"
+                    onClick={locateUser}
+                    disabled={locating}
+                    className="rounded-xl border border-teal-200 bg-white px-3 py-2 text-xs font-semibold text-teal-900 transition hover:bg-teal-50 disabled:opacity-60"
+                  >
+                    {locating ? t.findClinic.locating : t.findClinic.useMyLocation}
+                  </button>
+                </div>
+                <p className="mt-2 text-xs text-stone-600">{t.findClinic.siteDirectionsHint}</p>
+                {locationError ? <p className="mt-2 text-xs text-rose-700">{locationError}</p> : null}
+              </div>
               {(() => {
                 const lat = parseCoord(detail.latitude)
                 const lng = parseCoord(detail.longitude)
@@ -348,12 +437,21 @@ export function ClinicSearchForm({
                   {recordMsg}
                 </p>
               )}
+              <button
+                type="button"
+                onClick={() => setDetailOpen(false)}
+                className="w-full rounded-2xl border border-stone-200 bg-stone-50 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-stone-100"
+              >
+                {t.home.closeArticle}
+              </button>
             </div>
           ) : (
             <p className="text-sm text-stone-600">{t.findClinic.selectHint}</p>
           )}
+          </motion.div>
         </motion.div>
       )}
+      </AnimatePresence>
     </div>
   )
 }

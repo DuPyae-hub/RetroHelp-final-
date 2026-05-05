@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../api/client'
 import { isAdmin } from '../constants/roles'
@@ -26,6 +26,7 @@ type PendingCenter = {
   id: number
   name: string
   nickname: string | null
+  image: string | null
   township: string | null
   area: string | null
   contact_no: string | null
@@ -50,6 +51,48 @@ type OverviewPayload = {
   }
 }
 
+function DonutChart({
+  slices,
+}: {
+  slices: { value: number; color: string; label: string }[]
+}) {
+  const total = Math.max(1, slices.reduce((sum, s) => sum + s.value, 0))
+  const r = 42
+  const c = 2 * Math.PI * r
+  let offset = 0
+  return (
+    <svg viewBox="0 0 120 120" className="h-28 w-28">
+      <circle cx="60" cy="60" r={r} fill="none" stroke="#e7e5e4" strokeWidth="14" />
+      {slices.map((s) => {
+        const len = (s.value / total) * c
+        const el = (
+          <circle
+            key={s.label}
+            cx="60"
+            cy="60"
+            r={r}
+            fill="none"
+            stroke={s.color}
+            strokeWidth="14"
+            strokeDasharray={`${len} ${Math.max(0, c - len)}`}
+            strokeDashoffset={-offset}
+            transform="rotate(-90 60 60)"
+          />
+        )
+        offset += len
+        return el
+      })}
+      <circle cx="60" cy="60" r="26" fill="#fff" />
+      <text x="60" y="56" textAnchor="middle" className="fill-stone-500 text-[9px] font-semibold">
+        BOOKINGS
+      </text>
+      <text x="60" y="72" textAnchor="middle" className="fill-stone-900 text-[15px] font-extrabold">
+        {slices.reduce((sum, s) => sum + s.value, 0)}
+      </text>
+    </svg>
+  )
+}
+
 export function AdminDashboardPage() {
   const { t } = useLanguage()
   const { user, loading: authLoading } = useAuth()
@@ -62,9 +105,11 @@ export function AdminDashboardPage() {
 
   const [staffRows, setStaffRows] = useState<PendingStaff[] | null>(null)
   const [staffBusyId, setStaffBusyId] = useState<number | null>(null)
+  const [staffSearch, setStaffSearch] = useState('')
 
   const [centerRows, setCenterRows] = useState<PendingCenter[] | null>(null)
   const [centerBusyId, setCenterBusyId] = useState<number | null>(null)
+  const [centerSearch, setCenterSearch] = useState('')
 
   const loadOverview = useCallback(async () => {
     setOverviewLoading(true)
@@ -141,6 +186,22 @@ export function AdminDashboardPage() {
     }
   }
 
+  const filteredStaffRows = useMemo(() => {
+    const rows = staffRows ?? []
+    const q = staffSearch.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter((r) => r.full_name.toLowerCase().includes(q))
+  }, [staffRows, staffSearch])
+
+  const filteredCenterRows = useMemo(() => {
+    const rows = centerRows ?? []
+    const q = centerSearch.trim().toLowerCase()
+    if (!q) return rows
+    return rows.filter((c) =>
+      [c.name, c.township, c.area, c.nickname, c.contact_no].filter(Boolean).join(' ').toLowerCase().includes(q),
+    )
+  }, [centerRows, centerSearch])
+
   if (authLoading) {
     return (
       <motion.div
@@ -174,7 +235,7 @@ export function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-100 via-orange-50/35 to-teal-50/35">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(249,115,22,0.18),transparent_32%),linear-gradient(to_bottom_right,#f5f5f4,rgba(254,215,170,0.35),rgba(236,253,245,0.45))]">
       <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
         <motion.div
           variants={staggerContainer}
@@ -182,7 +243,10 @@ export function AdminDashboardPage() {
           animate="visible"
           className="grid gap-5 lg:grid-cols-12"
         >
-          <motion.header variants={staggerItem} className={`lg:col-span-12 ${glassPanel} p-6 sm:p-8`}>
+          <motion.header variants={staggerItem} className={`lg:col-span-12 border-orange-300/45 ${glassPanel} p-6 sm:p-8`}>
+            <p className="mb-2 inline-flex rounded-full border border-orange-300/50 bg-orange-50/70 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-orange-900">
+              Admin Control Center
+            </p>
             <h1 className="text-3xl font-extrabold tracking-tight text-stone-900">
               {t.adminDash.title}
             </h1>
@@ -205,6 +269,39 @@ export function AdminDashboardPage() {
                 {t.adminDash.tabs[id]}
               </button>
             ))}
+          </motion.div>
+          <motion.div
+            variants={staggerItem}
+            className="grid gap-4 sm:grid-cols-2 lg:col-span-12 lg:grid-cols-3"
+          >
+            <button
+              type="button"
+              onClick={() => setTab('overview')}
+              className={`text-left ${glassPanel} p-5 transition hover:scale-[1.01]`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-teal-800">{t.adminDash.quickOverview}</p>
+              <p className="mt-1 text-sm text-stone-600">{t.adminDash.quickOverviewSub}</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('staff')}
+              className={`text-left ${glassPanel} p-5 transition hover:scale-[1.01]`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">{t.adminDash.quickPendingStaff}</p>
+              <p className="mt-1 text-sm font-bold text-stone-900 tabular-nums">
+                {overview?.users.pending_clinic_staff ?? 0}
+              </p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab('clinics')}
+              className={`text-left ${glassPanel} p-5 transition hover:scale-[1.01]`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-wide text-orange-800">{t.adminDash.quickPendingClinics}</p>
+              <p className="mt-1 text-sm font-bold text-stone-900 tabular-nums">
+                {overview?.art_centers.pending_verification ?? 0}
+              </p>
+            </button>
           </motion.div>
 
           {error ? (
@@ -311,18 +408,30 @@ export function AdminDashboardPage() {
                     <p className="text-xs font-bold uppercase tracking-wide text-teal-800">
                       {t.adminDash.bookingsByStatus}
                     </p>
-                    <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                      {Object.entries(overview.bookings.by_status).map(([k, v]) => (
-                        <li
-                          key={k}
-                          className="rounded-2xl border border-white/50 bg-white/35 px-4 py-3 text-sm backdrop-blur-md"
-                        >
-                          <span className="font-semibold text-stone-800">{k}</span>
-                          <span className="ml-2 tabular-nums text-stone-600">{v}</span>
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="mt-5 text-xs text-stone-500">{t.adminDash.overviewHint}</p>
+                    <div className="mt-4 grid gap-4 md:grid-cols-[auto_1fr] md:items-center">
+                      <DonutChart
+                        slices={Object.entries(overview.bookings.by_status).map(([k, v], idx) => ({
+                          label: k,
+                          value: Number(v) || 0,
+                          color: ['#0ea5e9', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#14b8a6', '#ef4444'][idx % 7],
+                        }))}
+                      />
+                      <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                        {Object.entries(overview.bookings.by_status).map(([k, v], idx) => {
+                          const color = ['#0ea5e9', '#f59e0b', '#10b981', '#f97316', '#8b5cf6', '#14b8a6', '#ef4444'][idx % 7]
+                          return (
+                            <li
+                              key={k}
+                              className="rounded-2xl border border-white/50 bg-white/35 px-4 py-3 text-sm backdrop-blur-md"
+                            >
+                              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: color }} />{' '}
+                              <span className="font-semibold text-stone-800">{k}</span>
+                              <span className="ml-2 tabular-nums text-stone-600">{v}</span>
+                            </li>
+                          )
+                        })}
+                      </ul>
+                    </div>
                   </motion.div>
                 </motion.div>
               ) : (
@@ -336,9 +445,17 @@ export function AdminDashboardPage() {
               <div className={`${glassPanel} p-6 sm:p-8`}>
                 <h2 className="text-lg font-bold text-stone-900">{t.admin.pendingTitle}</h2>
                 <p className="mt-2 text-sm text-stone-600">{t.admin.pendingDescription}</p>
+                <div className="mt-4">
+                  <input
+                    value={staffSearch}
+                    onChange={(e) => setStaffSearch(e.target.value)}
+                    placeholder={t.adminDash.searchStaffPh}
+                    className="w-full max-w-sm rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-sm text-stone-900 backdrop-blur-md"
+                  />
+                </div>
                 {staffRows === null ? (
                   <p className="mt-6 text-stone-600">{t.admin.loading}</p>
-                ) : staffRows.length === 0 ? (
+                ) : filteredStaffRows.length === 0 ? (
                   <p className="mt-6 rounded-[1.75rem] border border-dashed border-orange-200/80 bg-white/40 px-5 py-10 text-center text-sm text-stone-600 backdrop-blur-sm">
                     {t.admin.empty}
                   </p>
@@ -349,7 +466,7 @@ export function AdminDashboardPage() {
                     animate="visible"
                     className="mt-6 grid gap-4 sm:grid-cols-2"
                   >
-                    {staffRows.map((r) => (
+                    {filteredStaffRows.map((r) => (
                       <motion.li
                         key={r.id}
                         variants={staggerItem}
@@ -382,9 +499,17 @@ export function AdminDashboardPage() {
               <div className={`${glassPanel} p-6 sm:p-8`}>
                 <h2 className="text-lg font-bold text-stone-900">{t.adminDash.clinicsTitle}</h2>
                 <p className="mt-2 text-sm text-stone-600">{t.adminDash.clinicsDescription}</p>
+                <div className="mt-4">
+                  <input
+                    value={centerSearch}
+                    onChange={(e) => setCenterSearch(e.target.value)}
+                    placeholder={t.adminDash.searchClinicPh}
+                    className="w-full max-w-sm rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-sm text-stone-900 backdrop-blur-md"
+                  />
+                </div>
                 {centerRows === null ? (
                   <p className="mt-6 text-stone-600">{t.admin.loading}</p>
-                ) : centerRows.length === 0 ? (
+                ) : filteredCenterRows.length === 0 ? (
                   <p className="mt-6 rounded-[1.75rem] border border-dashed border-orange-200/80 bg-white/40 px-5 py-10 text-center text-sm text-stone-600 backdrop-blur-sm">
                     {t.adminDash.clinicsEmpty}
                   </p>
@@ -395,13 +520,22 @@ export function AdminDashboardPage() {
                     animate="visible"
                     className="mt-6 grid gap-4 lg:grid-cols-2"
                   >
-                    {centerRows.map((c) => (
+                    {filteredCenterRows.map((c) => (
                       <motion.li
                         key={c.id}
                         variants={staggerItem}
                         className={`flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between ${glassPanel} p-5`}
                       >
                         <div>
+                          <div className="mb-2 overflow-hidden rounded-xl border border-orange-100/80 bg-orange-50/40">
+                            {c.image ? (
+                              <img src={c.image} alt={c.name} className="h-20 w-full object-cover" loading="lazy" />
+                            ) : (
+                              <div className="flex h-20 items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 text-xl">
+                                🏥
+                              </div>
+                            )}
+                          </div>
                           <p className="font-semibold text-stone-900">{c.name}</p>
                           <p className="mt-1 text-xs text-stone-500">
                             {[c.township, c.area].filter(Boolean).join(' · ') || '—'}

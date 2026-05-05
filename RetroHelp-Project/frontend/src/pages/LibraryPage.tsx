@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { api, getApiErrorMessage } from '../api/client'
 import { AnimatedLibraryMascot } from '../components/AnimatedSectionMascots'
+import { BookingStatusMascot } from '../components/BookingStatusMascot'
 import { partitionResourceLibrary } from '../lib/resourceLibraryCategory'
 import { useLanguage } from '../i18n/LanguageContext'
 import type { TranslationTree } from '../i18n/translations'
@@ -41,20 +42,36 @@ export function LibraryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mb-10 flex flex-col items-start gap-6 sm:mb-12 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl"
-        >
-          <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
-            {t.library.title}
-          </h1>
-          <p className="mt-3 text-base leading-relaxed text-stone-600 sm:text-lg">
-            {t.library.description}
-          </p>
-        </motion.div>
-        <AnimatedLibraryMascot className="mx-auto h-32 w-32 sm:mx-0 sm:h-36 sm:w-36" />
+      <div className="mb-8 rounded-3xl border border-orange-100/80 bg-gradient-to-br from-white to-orange-50/60 p-6 shadow-sm sm:mb-10 sm:p-8">
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8">
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl"
+          >
+            <h1 className="text-3xl font-extrabold tracking-tight text-stone-900 sm:text-4xl">
+              {t.library.title}
+            </h1>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <AnimatedLibraryMascot className="h-12 w-12" />
+              <BookingStatusMascot status="accepted" size={46} />
+              <AnimatedLibraryMascot className="h-12 w-12" />
+              <BookingStatusMascot status="completed" size={46} />
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-900">
+                {t.library.chipShort}
+              </span>
+              <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-900">
+                {t.library.chipCategories}
+              </span>
+              <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-900">
+                {t.library.chipQuickRead}
+              </span>
+            </div>
+          </motion.div>
+          <AnimatedLibraryMascot className="mx-auto h-32 w-32 sm:mx-0 sm:h-36 sm:w-36" />
+        </div>
       </div>
 
       {error && (
@@ -136,9 +153,16 @@ function ResourceCard({
       transition={{ delay: index * 0.05 }}
       className="flex flex-col rounded-3xl border border-orange-100/90 bg-white p-6 shadow-lg shadow-teal-900/5"
     >
-      <h3 className="text-lg font-bold text-stone-900">{item.title}</h3>
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <h3 className="text-lg font-bold text-stone-900">{item.title}</h3>
+        {index % 2 === 0 ? (
+          <AnimatedLibraryMascot className="h-12 w-12" />
+        ) : (
+          <BookingStatusMascot status="completed" size={46} />
+        )}
+      </div>
       {item.content && (
-        <p className="mt-3 flex-1 text-sm leading-relaxed text-stone-600">
+        <p className="mt-2 line-clamp-4 flex-1 text-sm leading-relaxed text-stone-600">
           {item.content}
         </p>
       )}
