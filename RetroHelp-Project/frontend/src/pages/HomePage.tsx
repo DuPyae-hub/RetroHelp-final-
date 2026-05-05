@@ -300,28 +300,28 @@ export function HomePage() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: '-24px' }}
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-12"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {clinics.map((c, i) => (
                   <motion.article
                     key={c.id}
                     variants={staggerItem}
-                    className={`${glassPanel} flex flex-col p-5 sm:p-6 ${
-                      i === 0
-                        ? 'sm:col-span-2 lg:col-span-7'
-                        : i === 1 || i === 2
-                          ? 'lg:col-span-5'
-                          : 'lg:col-span-4'
-                    }`}
+                    className={`${glassPanel} flex flex-col p-5 sm:p-6`}
                   >
-                    <div className="mb-4 overflow-hidden rounded-2xl border border-orange-100/70 bg-orange-50/50">
+                    <div className="relative mb-4 overflow-hidden rounded-2xl border border-orange-100/70 bg-orange-50/50">
+                      <motion.div
+                        initial={{ scale: 0.9, opacity: 0.9 }}
+                        animate={{ scale: [1, 1.08, 1], y: [0, -2, 0] }}
+                        transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.15 }}
+                        className="absolute left-3 top-3 z-10 inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-teal-500 to-orange-400 px-2 text-sm font-extrabold text-white shadow-md shadow-teal-900/25"
+                      >
+                        {i + 1}
+                      </motion.div>
                       {c.image ? (
                         <img
                           src={c.image}
                           alt={c.name}
-                          className={`w-full object-cover ${
-                            i === 0 ? 'h-40 sm:h-44' : 'h-24 sm:h-28'
-                          }`}
+                          className="h-32 w-full object-cover sm:h-36"
                           loading="lazy"
                           onError={(e) => {
                             e.currentTarget.style.display = 'none'
@@ -333,9 +333,7 @@ export function HomePage() {
                       <div
                         className={`${
                           c.image ? 'hidden' : 'flex'
-                        } w-full items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 ${
-                          i === 0 ? 'h-40 sm:h-44' : 'h-24 sm:h-28'
-                        }`}
+                        } h-32 w-full items-center justify-center bg-gradient-to-r from-teal-100 to-orange-100 sm:h-36`}
                       >
                         <div className="rounded-2xl border border-white/70 bg-white/70 px-4 py-2 text-center backdrop-blur">
                           <p className="text-xl">🏥</p>
@@ -344,9 +342,7 @@ export function HomePage() {
                       </div>
                     </div>
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className={`${i === 0 ? 'text-xl sm:text-2xl' : 'text-lg'} font-bold text-stone-900`}>
-                        {c.name}
-                      </h3>
+                      <h3 className="text-lg font-bold text-stone-900">{c.name}</h3>
                       {c.is_verified && (
                         <span className="shrink-0 rounded-full bg-teal-500/20 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-900 backdrop-blur-sm">
                           {t.findClinic.verified}
@@ -384,9 +380,7 @@ export function HomePage() {
                     <div className="pt-3">
                       <Link
                         to={`/find-clinic?center=${c.id}`}
-                        className={`flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 ${
-                          i === 0 ? 'py-3.5 text-base' : 'py-3 text-sm'
-                        } font-semibold text-white shadow-lg shadow-teal-900/30`}
+                        className="flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/30"
                       >
                         {t.home.viewDirections}
                       </Link>

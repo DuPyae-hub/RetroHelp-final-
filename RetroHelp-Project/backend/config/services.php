@@ -44,4 +44,14 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
     ],
 
+    /*
+    | Free local fallback via Ollama (no paid API required).
+    | Install: https://ollama.com, run `ollama serve`, pull a model like `ollama pull llama3.2`.
+    */
+    'ollama' => [
+        'enabled' => env('OLLAMA_ENABLED', false),
+        'base_url' => env('OLLAMA_BASE_URL', 'http://127.0.0.1:11434'),
+        'model' => env('OLLAMA_MODEL', 'llama3.2'),
+    ],
+
 ];

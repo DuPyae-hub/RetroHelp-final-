@@ -24,15 +24,6 @@ class SupportChatController extends Controller
             'messages.*.content' => ['required', 'string', 'max:4000'],
         ]);
 
-        $apiKey = config('services.gemini.api_key');
-        if ($apiKey === null || $apiKey === '') {
-            return response()->json([
-                'message' => 'AI support is not configured. Set GEMINI_API_KEY on the server.',
-            ], 503);
-        }
-
-        $model = (string) config('services.gemini.model', 'gemini-2.0-flash');
-
         $user = Auth::guard('sanctum')->user();
         $userHint = $user !== null
             ? 'The visitor is signed in to RetroHelp'.($user->nickname !== null && $user->nickname !== '' ? " (nickname: {$user->nickname})." : '.')
@@ -66,6 +57,53 @@ SYS;
             ];
         }
 
+        $geminiConfigured = trim((string) config('services.gemini.api_key', '')) !== '';
+        $ollamaEnabled = (bool) config('services.ollama.enabled', false);
+
+        $text = $this->chatWithProvider($system, $contents);
+        if ($text === null || $text === '') {
+            if ($geminiConfigured || $ollamaEnabled) {
+                return response()->json([
+                    'message' => 'Could not reach the AI service. Try again in a moment.',
+                ], 502);
+            }
+
+            return response()->json([
+                'message' => 'AI support is not configured. Set GEMINI_API_KEY, or enable local OLLAMA (OLLAMA_ENABLED=true).',
+            ], 503);
+        }
+
+        return response()->json([
+            'data' => [
+                'message' => trim($text),
+            ],
+        ]);
+    }
+
+    /**
+     * @param  array<int, array{role: string, parts: array<int, array{text: string}>}>  $contents
+     */
+    private function chatWithProvider(string $system, array $contents): ?string
+    {
+        $geminiApiKey = (string) config('services.gemini.api_key', '');
+        if (trim($geminiApiKey) !== '') {
+            return $this->chatWithGemini($geminiApiKey, $system, $contents);
+        }
+
+        $ollamaEnabled = (bool) config('services.ollama.enabled', false);
+        if ($ollamaEnabled) {
+            return $this->chatWithOllama($system, $contents);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param  array<int, array{role: string, parts: array<int, array{text: string}>}>  $contents
+     */
+    private function chatWithGemini(string $apiKey, string $system, array $contents): ?string
+    {
+        $model = (string) config('services.gemini.model', 'gemini-2.0-flash');
         $url = self::GEMINI_API_HOST.'/v1beta/models/'.rawurlencode($model).':generateContent';
 
         $body = [
@@ -87,11 +125,9 @@ SYS;
                 ])
                 ->post($url, $body);
         } catch (\Throwable $e) {
-            Log::warning('support.chat.transport', ['error' => $e->getMessage()]);
+            Log::warning('support.chat.gemini.transport', ['error' => $e->getMessage()]);
 
-            return response()->json([
-                'message' => 'Could not reach the AI service. Try again in a moment.',
-            ], 502);
+            return null;
         }
 
         if (! $response->successful()) {
@@ -100,26 +136,57 @@ SYS;
                 'body' => $response->body(),
             ]);
 
-            return response()->json([
-                'message' => 'The AI service returned an error. Please try again later.',
-            ], 502);
+            return null;
         }
 
-        $json = $response->json();
-        $text = $this->extractGeminiText($json);
-        if ($text === null || $text === '') {
-            Log::warning('support.chat.gemini.empty', ['json' => $json]);
+        return $this->extractGeminiText($response->json());
+    }
 
-            return response()->json([
-                'message' => 'Unexpected response from the AI service.',
-            ], 502);
+    /**
+     * @param  array<int, array{role: string, parts: array<int, array{text: string}>}>  $contents
+     */
+    private function chatWithOllama(string $system, array $contents): ?string
+    {
+        $baseUrl = rtrim((string) config('services.ollama.base_url', 'http://127.0.0.1:11434'), '/');
+        $model = (string) config('services.ollama.model', 'llama3.2');
+        $url = $baseUrl.'/api/chat';
+
+        $messages = [['role' => 'system', 'content' => $system]];
+        foreach ($contents as $row) {
+            $role = $row['role'] === 'model' ? 'assistant' : 'user';
+            $messages[] = [
+                'role' => $role,
+                'content' => (string) data_get($row, 'parts.0.text', ''),
+            ];
         }
 
-        return response()->json([
-            'data' => [
-                'message' => trim($text),
-            ],
-        ]);
+        try {
+            $response = Http::timeout(120)->post($url, [
+                'model' => $model,
+                'messages' => $messages,
+                'stream' => false,
+                'options' => [
+                    'temperature' => 0.45,
+                ],
+            ]);
+        } catch (\Throwable $e) {
+            Log::warning('support.chat.ollama.transport', ['error' => $e->getMessage()]);
+
+            return null;
+        }
+
+        if (! $response->successful()) {
+            Log::warning('support.chat.ollama', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            return null;
+        }
+
+        $content = data_get($response->json(), 'message.content');
+
+        return is_string($content) ? trim($content) : null;
     }
 
     /**

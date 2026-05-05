@@ -10,6 +10,7 @@ class SupportChatTest extends TestCase
     public function test_chat_returns_503_when_api_key_missing(): void
     {
         config(['services.gemini.api_key' => '']);
+        config(['services.ollama.enabled' => false]);
 
         $response = $this->postJson('/api/support/chat', [
             'messages' => [
@@ -52,5 +53,31 @@ class SupportChatTest extends TestCase
 
         $response->assertOk();
         $response->assertJsonPath('data.message', 'Here is a helpful reply.');
+    }
+
+    public function test_chat_returns_assistant_message_when_ollama_fallback_succeeds(): void
+    {
+        config(['services.gemini.api_key' => '']);
+        config(['services.ollama.enabled' => true]);
+        config(['services.ollama.base_url' => 'http://127.0.0.1:11434']);
+        config(['services.ollama.model' => 'llama3.2']);
+
+        Http::fake([
+            'http://127.0.0.1:11434/api/chat' => Http::response([
+                'message' => [
+                    'role' => 'assistant',
+                    'content' => 'Hello from local Ollama.',
+                ],
+            ], 200),
+        ]);
+
+        $response = $this->postJson('/api/support/chat', [
+            'messages' => [
+                ['role' => 'user', 'content' => 'Can you help me?'],
+            ],
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.message', 'Hello from local Ollama.');
     }
 }
