@@ -11,6 +11,7 @@ class ResourceLibrary extends Model
     protected $fillable = [
         'title',
         'content',
+        'ebook_url',
         'category',
     ];
 }

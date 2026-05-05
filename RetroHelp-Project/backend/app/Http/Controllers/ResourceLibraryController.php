@@ -33,6 +33,7 @@ class ResourceLibraryController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'content' => ['nullable', 'string', 'max:60000'],
+            'ebook_url' => ['nullable', 'url', 'max:2048'],
             'category' => ['nullable', 'string', 'max:255'],
         ]);
 

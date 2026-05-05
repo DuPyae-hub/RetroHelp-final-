@@ -39,6 +39,14 @@ export function LibraryPage() {
     () => partitionResourceLibrary(items ?? []),
     [items],
   )
+  const psychosocialEbooks = useMemo(
+    () =>
+      (items ?? []).filter((item) => {
+        const cat = (item.category ?? '').toLowerCase()
+        return Boolean(item.ebook_url) && (cat.includes('psych') || cat.includes('mental'))
+      }),
+    [items],
+  )
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -63,12 +71,10 @@ export function LibraryPage() {
                 {t.library.chipShort}
               </span>
               <span className="rounded-full bg-orange-100 px-3 py-1 text-xs font-semibold text-orange-900">
-                {t.library.chipCategories}
-              </span>
-              <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-900">
-                {t.library.chipQuickRead}
+                {t.library.chipEbooks}
               </span>
             </div>
+            <p className="mt-3 text-sm text-stone-600">{t.library.minimalHint}</p>
           </motion.div>
           <AnimatedLibraryMascot className="mx-auto h-32 w-32 sm:mx-0 sm:h-36 sm:w-36" />
         </div>
@@ -86,6 +92,20 @@ export function LibraryPage() {
         </p>
       ) : (
         <div className="space-y-14">
+          <section>
+            <h2 className="mb-5 text-xl font-bold text-violet-900 sm:text-2xl">{t.library.ebooksTitle}</h2>
+            {psychosocialEbooks.length === 0 ? (
+              <p className="rounded-3xl border border-dashed border-violet-200 bg-white/70 px-5 py-8 text-center text-sm text-stone-600">
+                {t.library.emptyEbooks}
+              </p>
+            ) : (
+              <ul className="grid gap-5 sm:grid-cols-2">
+                {psychosocialEbooks.map((item, i) => (
+                  <ResourceCard key={item.id} item={item} index={i} t={t} />
+                ))}
+              </ul>
+            )}
+          </section>
           <section>
             <h2 className="mb-5 text-xl font-bold text-teal-900 sm:text-2xl">
               {t.library.basics}
@@ -166,6 +186,16 @@ function ResourceCard({
           {item.content}
         </p>
       )}
+      {item.ebook_url ? (
+        <a
+          href={item.ebook_url}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-4 inline-flex items-center justify-center rounded-2xl border border-violet-200 bg-violet-50 px-4 py-2 text-xs font-semibold text-violet-900 transition hover:bg-violet-100"
+        >
+          {t.library.openEbook}
+        </a>
+      ) : null}
       <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-teal-700/90">
         {t.library.readTime}
       </p>

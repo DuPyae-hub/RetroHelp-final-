@@ -96,6 +96,7 @@ export function StaffDashboardPage() {
 
   const [articleTitle, setArticleTitle] = useState('')
   const [articleBody, setArticleBody] = useState('')
+  const [articleEbookUrl, setArticleEbookUrl] = useState('')
   const [articleCategory, setArticleCategory] = useState('Basics')
   const [articleBusy, setArticleBusy] = useState(false)
   const [articleMsg, setArticleMsg] = useState<string | null>(null)
@@ -255,11 +256,13 @@ export function StaffDashboardPage() {
       await api.post('/api/resource-libraries', {
         title: articleTitle.trim(),
         content: articleBody.trim() || null,
+        ebook_url: articleEbookUrl.trim() || null,
         category: articleCategory || null,
       })
       setArticleMsg(t.staffDash.articleSuccess)
       setArticleTitle('')
       setArticleBody('')
+      setArticleEbookUrl('')
     } catch (err) {
       setArticleErr(getApiErrorMessage(err))
     } finally {
@@ -863,6 +866,13 @@ export function StaffDashboardPage() {
                     >
                       {t.staffDash.presetCare}
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setArticleCategory('Psychosocial')}
+                      className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-800"
+                    >
+                      {t.staffDash.presetPsychosocial}
+                    </button>
                   </div>
                   <label className="block text-sm font-semibold text-stone-800">
                     {t.staffDash.articleTitle}
@@ -891,6 +901,16 @@ export function StaffDashboardPage() {
                       value={articleBody}
                       onChange={(e) => setArticleBody(e.target.value)}
                       rows={8}
+                      className="mt-1 w-full rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-stone-900 backdrop-blur-md"
+                    />
+                  </label>
+                  <label className="block text-sm font-semibold text-stone-800">
+                    {t.staffDash.articleEbookUrl}
+                    <input
+                      type="url"
+                      value={articleEbookUrl}
+                      onChange={(e) => setArticleEbookUrl(e.target.value)}
+                      placeholder="https://example.com/support-ebook.pdf"
                       className="mt-1 w-full rounded-2xl border border-white/60 bg-white/50 px-3 py-2 text-stone-900 backdrop-blur-md"
                     />
                   </label>

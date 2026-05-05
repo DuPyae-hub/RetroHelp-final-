@@ -2,6 +2,7 @@ export type ResourceLibraryItem = {
   id: number
   title: string
   content: string | null
+  ebook_url?: string | null
   category: string | null
   created_at: string | null
   updated_at: string | null
