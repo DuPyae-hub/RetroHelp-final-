@@ -411,7 +411,111 @@ export const translations = {
       aiThinking: 'Thinking…',
       aiError: 'Could not get a reply. Please try again.',
       aiUnavailable:
-        'AI support is not enabled on the server yet. Ask your administrator to set GEMINI_API_KEY (Google AI Studio).',
+        'AI support is not enabled on the server yet. Ask your administrator to set GROQ_API_KEY (Groq Console).',
+    },
+    faqPage: {
+      sectionLabel: 'Common questions',
+      tapHint: 'Tap a question to expand or collapse the answer.',
+      searchPlaceholder: 'Search questions…',
+      noResults: 'No questions match your search. Try another word.',
+      items: [
+        {
+          q: 'What is RetroHelp?',
+          a:
+            'RetroHelp is a community HIV/ART care navigation app. It helps you find verified ART centers, read trusted education in the Library, and manage pill pick-up visit requests—with confidential nickname sign-in.',
+        },
+        {
+          q: 'Why do I use a nickname instead of my legal name?',
+          a:
+            'Community member accounts use a nickname you choose (plus an internal ID). Legal names are not used for everyday display in the app, which helps protect your privacy.',
+        },
+        {
+          q: 'Can RetroHelp diagnose me or change my HIV treatment?',
+          a:
+            'No. RetroHelp provides general information and navigation support only—it is not medical advice. Always follow your clinician for diagnoses, prescriptions, and personal medical decisions.',
+        },
+        {
+          q: 'How do I search for a clinic?',
+          a:
+            'Open Find Clinic, enter a keyword (clinic name or place), then browse results. When signed in, you can open maps, request a pill pick-up visit for your clinic to see, or save a private route plan that does not notify the clinic.',
+        },
+        {
+          q: 'What does “verified” mean on a clinic listing?',
+          a:
+            'Verified centers have gone through a partner review process so they meet trusted directory standards before being marked verified in the app.',
+        },
+        {
+          q: 'What happens after I request a pill pick-up visit?',
+          a:
+            'Your clinic can accept the request and track steps until you finish the visit. After approval, you must tap “I’m coming” before the deadline shown under Profile → My request sessions—or the request may cancel automatically.',
+        },
+        {
+          q: 'What is the AI support chat?',
+          a:
+            'It explains how RetroHelp works and points you to general information. It cannot replace your clinician. Use your care team for personal medical questions.',
+        },
+        {
+          q: 'How do clinic staff accounts work?',
+          a:
+            'Staff register with the full name their clinic recognizes and select their ART center. An administrator must approve the account before they can sign in on the Staff tab.',
+        },
+        {
+          q: 'How is my sign-in information handled?',
+          a:
+            'Your session stays on this device until you sign out. In production, traffic should use HTTPS. Never share your password and sign out on shared devices.',
+        },
+        {
+          q: 'Who do I contact for technical problems or ideas?',
+          a:
+            'Use Customer support for app issues or suggestions. For emergencies or urgent clinical concerns, call your clinic or trusted local crisis and emergency numbers—not the in-app chat.',
+        },
+      ],
+    },
+    aboutPage: {
+      missionTitle: 'What we do',
+      missionLead:
+        'RetroHelp connects community members to verified ART information and practical tools—using dignity-first language and confidential nickname sign-in.',
+      pillarsIntro: 'What guides us',
+      offersTitle: 'What you can do in the app',
+      offers: [
+        {
+          title: 'Find verified ART centers',
+          body:
+            'Search the directory, view maps and directions, and see signals like verification status and community-informed rankings.',
+        },
+        {
+          title: 'Learn from the Library',
+          body:
+            'Read short articles on care routines and emotional support. Content is educational—follow your clinician for personal treatment decisions.',
+        },
+        {
+          title: 'Manage visits more clearly',
+          body:
+            'When signed in, request pill pick-up visits, track progress on Profile, or save a private route plan that the clinic does not see.',
+        },
+      ],
+      closingTitle: 'Education, not a substitute for care',
+      closingBody:
+        'RetroHelp improves health literacy and access to trusted listings. It does not replace conversations with your HIV/ART care team.',
+    },
+    supportPage: {
+      scopeTitle: 'What this page is for',
+      scopeBody:
+        'Use Customer support for technical issues (login, maps, requests) and ideas to improve RetroHelp. For medical emergencies or urgent clinical questions, contact your clinic or local emergency services.',
+      guidelinesTitle: 'Before you write to us',
+      guidelines: [
+        'Describe what you were trying to do and what happened (screen or error text if any).',
+        'Note whether you are on phone or computer, and which browser you use.',
+        'Do not send passwords, ID numbers, or private medical details in messages.',
+        'For account or clinic-staff access issues, include whether you are a community member or staff.',
+      ],
+      channelsIntro: 'Ways to get help',
+      aiCardBadge: 'Available when configured',
+      stepOpen: 'Open Quick Support Chat from the floating button.',
+      stepAsk: 'Ask how the app works or where to find a feature.',
+      stepReply: 'Read the assistant reply—it shares general guidance, not personal medical instructions.',
+      privacyNote:
+        'Emergency numbers on this page are placeholders until your organization publishes local contacts.',
     },
     lang: {
       english: 'English',
@@ -830,7 +934,112 @@ export const translations = {
       aiThinking: 'စဉ်းစားနေသည်…',
       aiError: 'အဖြေမရပါ။ ထပ်စမ်းပါ။',
       aiUnavailable:
-        'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက GEMINI_API_KEY (Google AI Studio) သတ်မှတ်ရန် တောင်းပါ။',
+        'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက GROQ_API_KEY (Groq Console) သတ်မှတ်ရန် တောင်းပါ။',
+    },
+    faqPage: {
+      sectionLabel: 'မေးခွန်းများ',
+      tapHint: 'အဖြေဖတ်ရန် မေးခွန်းကို နှိပ်ပါ။',
+      searchPlaceholder: 'မေးခွန်းရှာရန်…',
+      noResults: 'ရှာဖွေမှုနှင့် ကိုက်ညီသော မေးခွန်းမရှိပါ။ စာလုံးပြောင်းပါ။',
+      items: [
+        {
+          q: 'RetroHelp ဘာလဲ။',
+          a:
+            'RetroHelp သည် အသိုင်းအဝိုင်းအဖွဲ့ဝင်များ ART စင်တာအမှန်အကန် ရှာဖွေရန်၊ စာကြည့်တိုက်တွင် ယုံကြည်ရသော ပညာရေးဖတ်ရှုရန်၊ ဆေးယူ လည်ပတ်မှု တောင်းဆိုမှုများကို စီမံရန် ကူညီသော HIV/ART စောင့်ရှောက်မှု လမ်းညွှန် အက်ပ်ဖြစ်သည်။ လျှို့ဝှက်အမည်ပြောင်ဖြင့် ဝင်ရောက်ပါသည်။',
+        },
+        {
+          q: 'ဘာကြောင့် ဥပဒေအမည်အစား အမည်ပြောင်သုံးရသလဲ။',
+          a:
+            'အသိုင်းအဝိုင်းအဖွဲ့ဝင် အကောင့်များတွင် သင်ရွေးသော အမည်ပြောင်နှင့် အတွင်းကုဒ်သာ သုံးပါသည်။ နေ့စဉ်ပြသမှုတွင် ဥပဒေအမည်ကို မသုံးသောကြောင့် လျှို့ဝှက်မှုကို ကာကွယ်ပေးသည်။',
+        },
+        {
+          q: 'RetroHelp က ရောဂါရှာဖွေပြီး ဆေးညွှန်ကြားချက်ပြောင်းလဲပေးနိုင်သလား။',
+          a:
+            'မဖြစ်နိုင်ပါ။ RetroHelp သည် အထွေထွေအချက်အလက်နှင့် လမ်းညွှန်မှုပေးခြင်းသာဖြစ်ပြီး ဆေးပညာအကြံပြုချက် မဟုတ်ပါ။ ရောဂါခွဲခြားမှု၊ ဆေးညွှန်ကြားချက်၊ ကိုယ်ရေးကိုယ်တာ ဆေးပညာဆုံးဖြတ်ချက်များအတွက် ဆရာဝန်ကို လိုက်နာပါ။',
+        },
+        {
+          q: 'ဆေးခန်းကို ဘယ်လိုရှာမလဲ။',
+          a:
+            'ဆေးခန်းရှာရန်စာမျက်နှာကို ဖွင့်ပြီး စာလုံး (ဆေးခန်းအမည် သို့မဟုတ် နေရာ) ရိုက်ပါ။ ရလဒ်များကို ကြည့်ရှုပါ။ ဝင်ရောက်ထားပါက မြေပုံ၊ လည်ပတ်မှု တောင်းဆိုမှု၊ ဆေးခန်းမသိသော ကိုယ်ပိုင်လမ်းကြောင်း သိမ်းခြင်းများ လုပ်နိုင်ပါသည်။',
+        },
+        {
+          q: '“အတည်ပြု” ဆေးခန်းဆိုတာ ဘာလဲ။',
+          a:
+            'အတည်ပြုထားသော စင်တာများသည် မိတ်ဖက်အဖွဲ့အစည်းများနှင့် စစ်ဆေးမှုကို လုပ်ဆောင်ပြီးနောက် စာရင်းတွင် ယုံကြည်ရသော စံချိန်နှင့် ကိုက်ညီမှ အတည်ပြုကြောင်း ပြပါသည်။',
+        },
+        {
+          q: 'ဆေးယူ လည်ပတ်မှု တောင်းဆိုပြီးရင် ဘာဖြစ်မလဲ။',
+          a:
+            'ဆေးခန်းက တောင်းဆိုမှုကို လက်ခံပြီး လုပ်ငန်းစဉ်ကို ခြေရာခံနိုင်သည်။ အတည်ပြုပြီးနောက် ကိုယ်ရေးအချက်အလက် → ကျွန်ုပ်၏ တောင်းဆိုမှု စက်ရှင်များတွင် ပြသသည့်နောက်ဆုံးအချိန်မတိုင်မီ “လာမည်” ကို နှိပ်ရမည်—မဟုတ်ပါက တောင်းဆိုမှု အလိုအလျောက် ပယ်ဖျက်နိုင်သည်။',
+        },
+        {
+          q: 'AI အကူအညီ စကားပြောသည် ဘာလဲ။',
+          a:
+            'အက်ပ် အလုပ်လုပ်ပုံနှင့် အထွေထွေအချက်အလက်များကို ရှင်းပြပါသည်။ ဆေးပညာအကြံပြုချက် မဟုတ်ပါ။ ကိုယ်ရေးကိုယ်တာ ဆေးမေးခွန်းများအတွက် သင့်စောင့်ရှောက်ရေးအဖွဲ့နှင့် တိုင်ပင်ပါ။',
+        },
+        {
+          q: 'ဆေးခန်းဝန်ထမ်း အကောင့် ဘယ်လိုလုပ်သလဲ။',
+          a:
+            'ဝန်ထမ်းများသည် ဆေးခန်းမှ သိသော အပြည့်အစုံ အမည်ဖြင့် မှတ်ပုံတင်ပြီး ART စင်တာကို ရွေးပါသည်။ စီမံခန့်ခွဲသူ အတည်မပြုမချင်း ဝန်ထမ်းကွက်မှ ဝင်ရောက်မရပါ။',
+        },
+        {
+          q: 'ဝင်ရောက်ခွင့်အချက်အလက် ဘယ်လိုထားရှိသလဲ။',
+          a:
+            'ထွက်သည့်အထိ ဤစက်တွင် သင်၏ အချက်အလက်များ သိမ်းပါသည်။ ထုတ်သုံးမှုတွင် HTTPS သုံးပါ။ စကားဝှက်ကို မမျှဝေပါနှင့်။ မျှဝေသုံးစွဲသော စက်တွင် ထွက်ပါ။',
+        },
+        {
+          q: 'နည်းပညာပြဿနာ သို့မဟုတ် အကြံပြုချက်အတွက် ဘယ်သူကို ဆက်သွယ်မလဲ။',
+          a:
+            'အက်ပ် ပြဿနာနှင့် တိုးတက်ရေးအတွက် ဖောက်သည်ပံ့ပိုးမှု စာမျက်နှာကို သုံးပါ။ အရေးပေါ် သို့မဟုတ် ဆေးပညာအရေးကို လည်ပတ်မှု စကားပြောနှင့် မဖြေရှင်းပါ—ဒေသတွင်း အရေးပေါ်နံပါတ်များနှင့် ဆေးခန်းကို ဆက်သွယ်ပါ။',
+        },
+      ],
+    },
+    aboutPage: {
+      missionTitle: 'ကျွန်ုပ်တို့ လုပ်ဆောင်သည်များ',
+      missionLead:
+        'RetroHelp သည် လေးမြတ်မှုအရင်ထားသော ဘာသာစကားနှင့် လျှို့ဝှက်အမည်ပြောင် ဝင်ရောက်မှုဖြင့် အသိုင်းအဝိုင်းအဖွဲ့ဝင်များကို အတည်ပြု ART အချက်အလက်များနှင့် လက်တွေ့ကိရိယာများသို့ ချိတ်ဆက်ပေးသည်။',
+      pillarsIntro: 'ကျွန်ုပ်တို့ လမ်းညွှန်မှု',
+      offersTitle: 'အက်ပ်တွင် လုပ်နိုင်သည်များ',
+      offers: [
+        {
+          title: 'အတည်ပြု ART စင်တာများ ရှာရန်',
+          body:
+            'စာရင်းရှာဖွေပါ၊ မြေပုံနှင့် လမ်းညွှန်ကြည့်ပါ၊ အတည်ပြုချက်၊ အသိုင်းအဝိုင်းအခြေပြု အဆင့်များကို ကြည့်ရှုပါ။',
+        },
+        {
+          title: 'စာကြည့်တိုက်မှ နောက်ဆုံးအချက်အလက်',
+          body:
+            'စောင့်ရှောက်မှုနှင့် စိတ်ပိုင်းဆိုင်ရာ ပံ့ပိုးမှုအကြို ဖတ်ရှုပါ။ ပညာရေးအတွက်သာဖြစ်ပြီး ကိုယ်ရေးကိုယ်တာ ကုသမှုအတွက် ဆရာဝန်ကို လိုက်နာပါ။',
+        },
+        {
+          title: 'လည်ပတ်မှုကို ရှင်းလင်းစွာ စီမံရန်',
+          body:
+            'ဝင်ရောက်ပြီးပါက ဆေးယူ လည်ပတ်မှု တောင်းဆိုပါ၊ ကိုယ်ရေးအချက်အလက်တွင် တိုးတက်မှုကို ခြေရာခံပါ၊ သို့မဟုတ် ဆေးခန်းမသိသော ကိုယ်ပိုင် လမ်းကြောင်း သိမ်းပါ။',
+        },
+      ],
+      closingTitle: 'ပညာရေးသာ—စောင့်ရှောက်မှုအစား မဟုတ်ပါ',
+      closingBody:
+        'RetroHelp သည် ကျန်းမာရေးဗဟုသုတနှင့် ယုံကြည်ရသော စာရင်းများကို လွယ်ကူစေသည်။ HIV/ART စောင့်ရှောက်ရေးအဖွဲ့နှင့် စကားပြောမှုကို အစားမထိုးပါ။',
+    },
+    supportPage: {
+      scopeTitle: 'ဤစာမျက်နှာ၏ ရည်ရွယ်ချက်',
+      scopeBody:
+        'ဝင်ရောက်မှု၊ မြေပုံ၊ တောင်းဆိုမှု စသဖြင့် နည်းပညာပြဿနာများနှင့် RetroHelp တိုးတက်ရေးအတွက် ဖောက်သည်ပံ့ပိုးမှု သုံးပါ။ ဆေးပညာအရေးပေါ် သို့မဟုတ် အရေးတကြီး မေးခွန်းများအတွက် ဆေးခန်းနှင့် ဒေသတွင်း အရေးပေါ်ဝန်ဆောင်မှုများကို ဆက်သွယ်ပါ။',
+      guidelinesTitle: 'စာမရေးမီ',
+      guidelines: [
+        'လုပ်ချင်သော အလုပ်နှင့် ဖြစ်ပေါ်လာသော အခြေအနေကို ဖော်ပြပါ (စာမျက်နှာ သို့မဟုတ် အမှားစာသား ရှိလျှင် ထည့်ပါ)။',
+        'ဖုန်း သို့မဟုတ် ကွန်ပျူတာနှင့် ဘရောက်ဇာအမျိုးအစား ဖော်ပြပါ။',
+        'စကားဝှက်၊ နံပါတ်များ သို့မဟုတ် လျှို့ဝှက်သော ဆေးအချက်အလက် မပို့ပါနှင့်။',
+        'အကောင့် သို့မဟုတ် ဆေးခန်းဝန်ထမ်း ဝင်ရောက်မှု ပြဿနာဖြစ်ပါက အသိုင်းအဝိုင်းအဖွဲ့ဝင် သို့မဟုတ် ဝန်ထမ်းကို ဖော်ပြပါ။',
+      ],
+      channelsIntro: 'အကူအညီ ရယူနည်းများ',
+      aiCardBadge: 'ဖွင့်ထားမှ သုံးနိုင်',
+      stepOpen: 'အောက်ခြေရှိ အမြန်အကူအညီ ခလုတ်မှ စကားပြောကို ဖွင့်ပါ။',
+      stepAsk: 'အက်ပ် အလုပ်လုပ်ပုံ သို့မဟုတ် လုပ်ဆောင်ချက် ရှာဖွေရန် မေးပါ။',
+      stepReply:
+        'အကူအညီပေးသူ၏ အဖြေကို ဖတ်ပါ—အထွေထွေလမ်းညွှန်ချက်သာ ပေးပြီး ကိုယ်ရေးကိုယ်တာ ဆေးညွှန်ကြားချက် မဟုတ်ပါ။',
+      privacyNote:
+        'ဤစာမျက်နှာရှိ အရေးပေါ်နံပါတ်များသည် သင်၏ အဖွဲ့အစည်းမထုတ်ပြမချင်း နေရာယူမှုပြသမှုသာဖြစ်သည်။',
     },
     lang: {
       english: 'English',

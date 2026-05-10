@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Log;
 
 class SupportChatController extends Controller
 {
-    private const GEMINI_API_HOST = 'https://generativelanguage.googleapis.com';
+    private const GROQ_API_HOST = 'https://api.groq.com';
 
     /**
-     * General RetroHelp support assistant (Google Gemini generateContent).
+     * General RetroHelp support assistant (Groq chat completions).
      * Not medical advice. Rate-limited per IP / user.
      */
     public function chat(Request $request): JsonResponse
@@ -57,19 +57,19 @@ SYS;
             ];
         }
 
-        $geminiConfigured = trim((string) config('services.gemini.api_key', '')) !== '';
+        $groqConfigured = trim((string) config('services.groq.api_key', '')) !== '';
         $ollamaEnabled = (bool) config('services.ollama.enabled', false);
 
         $text = $this->chatWithProvider($system, $contents);
         if ($text === null || $text === '') {
-            if ($geminiConfigured || $ollamaEnabled) {
+            if ($groqConfigured || $ollamaEnabled) {
                 return response()->json([
                     'message' => 'Could not reach the AI service. Try again in a moment.',
                 ], 502);
             }
 
             return response()->json([
-                'message' => 'AI support is not configured. Set GEMINI_API_KEY, or enable local OLLAMA (OLLAMA_ENABLED=true).',
+                'message' => 'AI support is not configured. Set GROQ_API_KEY, or enable local OLLAMA (OLLAMA_ENABLED=true).',
             ], 503);
         }
 
@@ -85,9 +85,9 @@ SYS;
      */
     private function chatWithProvider(string $system, array $contents): ?string
     {
-        $geminiApiKey = (string) config('services.gemini.api_key', '');
-        if (trim($geminiApiKey) !== '') {
-            return $this->chatWithGemini($geminiApiKey, $system, $contents);
+        $groqApiKey = (string) config('services.groq.api_key', '');
+        if (trim($groqApiKey) !== '') {
+            return $this->chatWithGroq($groqApiKey, $system, $contents);
         }
 
         $ollamaEnabled = (bool) config('services.ollama.enabled', false);
@@ -101,37 +101,38 @@ SYS;
     /**
      * @param  array<int, array{role: string, parts: array<int, array{text: string}>}>  $contents
      */
-    private function chatWithGemini(string $apiKey, string $system, array $contents): ?string
+    private function chatWithGroq(string $apiKey, string $system, array $contents): ?string
     {
-        $model = (string) config('services.gemini.model', 'gemini-2.0-flash');
-        $url = self::GEMINI_API_HOST.'/v1beta/models/'.rawurlencode($model).':generateContent';
-
-        $body = [
-            'systemInstruction' => [
-                'parts' => [['text' => $system]],
-            ],
-            'contents' => $contents,
-            'generationConfig' => [
-                'maxOutputTokens' => 900,
-                'temperature' => 0.45,
-            ],
-        ];
+        $model = (string) config('services.groq.model', 'llama-3.1-8b-instant');
+        $url = self::GROQ_API_HOST.'/openai/v1/chat/completions';
+        $messages = [['role' => 'system', 'content' => $system]];
+        foreach ($contents as $row) {
+            $messages[] = [
+                'role' => $row['role'] === 'model' ? 'assistant' : 'user',
+                'content' => (string) data_get($row, 'parts.0.text', ''),
+            ];
+        }
 
         try {
             $response = Http::timeout(90)
                 ->withHeaders([
                     'Content-Type' => 'application/json',
-                    'x-goog-api-key' => $apiKey,
+                    'Authorization' => 'Bearer '.$apiKey,
                 ])
-                ->post($url, $body);
+                ->post($url, [
+                    'model' => $model,
+                    'messages' => $messages,
+                    'temperature' => 0.45,
+                    'max_tokens' => 900,
+                ]);
         } catch (\Throwable $e) {
-            Log::warning('support.chat.gemini.transport', ['error' => $e->getMessage()]);
+            Log::warning('support.chat.groq.transport', ['error' => $e->getMessage()]);
 
             return null;
         }
 
         if (! $response->successful()) {
-            Log::warning('support.chat.gemini', [
+            Log::warning('support.chat.groq', [
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
@@ -139,7 +140,7 @@ SYS;
             return null;
         }
 
-        return $this->extractGeminiText($response->json());
+        return $this->extractGroqText($response->json());
     }
 
     /**
@@ -192,34 +193,14 @@ SYS;
     /**
      * @param  array<string, mixed>|null  $json
      */
-    private function extractGeminiText(?array $json): ?string
+    private function extractGroqText(?array $json): ?string
     {
         if ($json === null) {
             return null;
         }
-        $candidates = $json['candidates'] ?? null;
-        if (! is_array($candidates) || $candidates === []) {
-            return null;
-        }
-        $first = $candidates[0];
-        if (! is_array($first)) {
-            return null;
-        }
-        $content = $first['content'] ?? null;
-        if (! is_array($content)) {
-            return null;
-        }
-        $parts = $content['parts'] ?? null;
-        if (! is_array($parts) || $parts === []) {
-            return null;
-        }
-        $texts = [];
-        foreach ($parts as $part) {
-            if (is_array($part) && isset($part['text']) && is_string($part['text'])) {
-                $texts[] = $part['text'];
-            }
-        }
 
-        return $texts === [] ? null : implode("\n", $texts);
+        $content = data_get($json, 'choices.0.message.content');
+
+        return is_string($content) ? trim($content) : null;
     }
 }

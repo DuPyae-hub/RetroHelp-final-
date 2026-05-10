@@ -36,12 +36,12 @@ return [
     ],
 
     /*
-    | Google Gemini (customer support chat). Set GEMINI_API_KEY (AI Studio / Vertex).
-    | Model id examples: gemini-2.0-flash, gemini-1.5-flash, gemini-3-flash-preview
+    | Groq (customer support chat). Set GROQ_API_KEY.
+    | Model id examples: llama-3.1-8b-instant, llama-3.3-70b-versatile, mixtral-8x7b-32768
     */
-    'gemini' => [
-        'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-2.0-flash'),
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.1-8b-instant'),
     ],
 
     /*

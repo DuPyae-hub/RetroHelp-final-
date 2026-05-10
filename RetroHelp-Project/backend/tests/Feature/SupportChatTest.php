@@ -9,7 +9,7 @@ class SupportChatTest extends TestCase
 {
     public function test_chat_returns_503_when_api_key_missing(): void
     {
-        config(['services.gemini.api_key' => '']);
+        config(['services.groq.api_key' => '']);
         config(['services.ollama.enabled' => false]);
 
         $response = $this->postJson('/api/support/chat', [
@@ -19,28 +19,22 @@ class SupportChatTest extends TestCase
         ]);
 
         $response->assertStatus(503);
-        $this->assertStringContainsString('GEMINI_API_KEY', (string) $response->json('message'));
+        $this->assertStringContainsString('GROQ_API_KEY', (string) $response->json('message'));
     }
 
-    public function test_chat_returns_assistant_message_when_gemini_succeeds(): void
+    public function test_chat_returns_assistant_message_when_groq_succeeds(): void
     {
-        config(['services.gemini.api_key' => 'test-key']);
-        config(['services.gemini.model' => 'gemini-2.0-flash']);
+        config(['services.groq.api_key' => 'test-key']);
+        config(['services.groq.model' => 'llama-3.1-8b-instant']);
 
         Http::fake(function (\Illuminate\Http\Client\Request $request) {
-            if (! str_contains($request->url(), 'generativelanguage.googleapis.com')) {
+            if (! str_contains($request->url(), 'api.groq.com/openai/v1/chat/completions')) {
                 return Http::response('not found', 404);
             }
 
             return Http::response([
-                'candidates' => [
-                    [
-                        'content' => [
-                            'parts' => [
-                                ['text' => 'Here is a helpful reply.'],
-                            ],
-                        ],
-                    ],
+                'choices' => [
+                    ['message' => ['content' => 'Here is a helpful reply.']],
                 ],
             ], 200);
         });
@@ -57,7 +51,7 @@ class SupportChatTest extends TestCase
 
     public function test_chat_returns_assistant_message_when_ollama_fallback_succeeds(): void
     {
-        config(['services.gemini.api_key' => '']);
+        config(['services.groq.api_key' => '']);
         config(['services.ollama.enabled' => true]);
         config(['services.ollama.base_url' => 'http://127.0.0.1:11434']);
         config(['services.ollama.model' => 'llama3.2']);
