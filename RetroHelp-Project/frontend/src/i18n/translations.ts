@@ -394,6 +394,7 @@ export const translations = {
     support: {
       open: 'Support',
       title: 'How can we help?',
+      suggestionsStickyHint: 'Tap a quick question to send it, or type your own message below.',
       aiTab: 'AI Support',
       liveTab: 'Live Chat',
       comingSoon: 'Coming Soon',
@@ -412,6 +413,19 @@ export const translations = {
       aiError: 'Could not get a reply. Please try again.',
       aiUnavailable:
         'AI support is not enabled on the server yet. Ask your administrator to set GROQ_API_KEY (Groq Console).',
+      chatWelcomeTitle: 'Please feel free to ask anything you’d like about RetroHelp.',
+      chatSuggestions: [
+        'How do I find a verified ART center?',
+        'Why do I sign in with a nickname?',
+        'How does a pill pick-up visit request work?',
+        'What can the AI assistant help with?',
+      ],
+      clearChat: 'Clear chat messages',
+      clearChatShort: 'Clear',
+      clearChatDetail:
+        'Removes messages in this chat window only. Your profile, bookings, and clinic data are not deleted.',
+      closePanel: 'Close chat',
+      back: 'Back',
     },
     faqPage: {
       sectionLabel: 'Common questions',
@@ -917,6 +931,8 @@ export const translations = {
     support: {
       open: 'အကူအညီ',
       title: 'ဘယ်လိုကူညီရမလဲ။',
+      suggestionsStickyHint:
+        'အမြန် မေးခွန်းကို နှိပ်ပြီး ပို့ရန် သို့မဟုတ် အောက်တွင် ကိုယ်တိုင်ရိုက်ပါ။',
       aiTab: 'AI အကူအညီ',
       liveTab: 'တိုက်ရိုက်စကားပြော',
       comingSoon: 'မကြာမီ ဖွင့်ပါမည်',
@@ -935,6 +951,19 @@ export const translations = {
       aiError: 'အဖြေမရပါ။ ထပ်စမ်းပါ။',
       aiUnavailable:
         'ဤဆာဗာတွင် AI အကူအညီ မဖွင့်ရသေးပါ။ စီမံခန့်ခွဲသူက GROQ_API_KEY (Groq Console) သတ်မှတ်ရန် တောင်းပါ။',
+      chatWelcomeTitle: 'RetroHelp အကြောင်း သင်သိလိုသမျှကို မေးမြန်းနိုင်ပါသည်။',
+      chatSuggestions: [
+        'အတည်ပြု ART စင်တာကို ဘယ်လိုရှာမလဲ။',
+        'အမည်ပြောင်ဖြင့် ဘာကြောင့် ဝင်ရောက်ရသလဲ။',
+        'ဆေးယူ လည်ပတ်မှု တောင်းဆိုမှုကို ဘယ်လိုလုပ်မလဲ။',
+        'AI အကူအညီက ဘာတွေကို ကူညီနိုင်သလဲ။',
+      ],
+      clearChat: 'စကားပြောရှင်းမည်',
+      clearChatShort: 'ရှင်း',
+      clearChatDetail:
+        'ဤစကားပြောပြတင်းတွင်းမှ မက်ဆေ့ခ်ျများသာ ဖယ်ရှားပါသည်။ ကိုယ်ရေးအချက်အလက်၊ တောင်းဆိုမှုနှင့် ဆေးခန်းမှတ်တမ်းများ မဖျက်ပါ။',
+      closePanel: 'စကားပြောပိတ်မည်',
+      back: 'ပိတ်ရန်',
     },
     faqPage: {
       sectionLabel: 'မေးခွန်းများ',
