@@ -190,6 +190,22 @@ export function FloatingSupport() {
 
   const suggestions = t.support.chatSuggestions
 
+  const suggestionPills = (
+    <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {suggestions.map((text) => (
+        <button
+          key={text}
+          type="button"
+          onClick={() => void send(text)}
+          disabled={sending}
+          className="shrink-0 rounded-full border border-stone-200 bg-white px-4 py-2.5 text-left text-xs font-medium leading-snug text-stone-700 shadow-sm transition hover:border-teal-300 hover:bg-teal-50/60 disabled:opacity-50"
+        >
+          {text}
+        </button>
+      ))}
+    </div>
+  )
+
   return (
     <>
       <motion.button
@@ -268,32 +284,19 @@ export function FloatingSupport() {
               </header>
 
               <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-stone-50/80">
-                {/* Stays visible while chatting — quick prompts */}
-                <div className="shrink-0 border-b border-stone-100 bg-white px-3 pb-3 pt-2 shadow-sm">
-                  <p className="text-center text-[10px] font-semibold uppercase tracking-wider text-stone-500">
-                    {t.support.title}
-                  </p>
-                  <p className="mt-1 px-1 text-center text-[11px] leading-snug text-stone-500">
-                    {t.support.suggestionsStickyHint}
-                  </p>
-                  <div className="mt-2 -mx-1 flex gap-2 overflow-x-auto px-1 pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    {suggestions.map((text) => (
-                      <button
-                        key={text}
-                        type="button"
-                        onClick={() => void send(text)}
-                        disabled={sending}
-                        className="shrink-0 rounded-full border border-stone-200 bg-stone-50 px-3.5 py-2 text-left text-[11px] font-medium leading-snug text-stone-700 shadow-sm transition hover:border-teal-300 hover:bg-teal-50/80 disabled:opacity-50 sm:px-4 sm:text-xs"
-                      >
-                        {text}
-                      </button>
-                    ))}
+                {/* Former pill style; sticky only after user starts chatting */}
+                {hasUserMessages ? (
+                  <div className="shrink-0 border-b border-orange-50/90 bg-white px-5 pb-4 pt-4">
+                    <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                      {t.support.title}
+                    </p>
+                    {suggestionPills}
                   </div>
-                </div>
+                ) : null}
 
                 <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
                   {!hasUserMessages ? (
-                    <div className="flex flex-col items-center px-5 pb-4 pt-5">
+                    <div className="flex flex-col items-center px-5 pb-4 pt-6">
                       <SupportMascot />
                       <p className="mt-5 max-w-[280px] text-center text-[15px] font-semibold leading-snug text-stone-800">
                         {t.support.chatWelcomeTitle}
@@ -301,6 +304,12 @@ export function FloatingSupport() {
                       <p className="mt-2 max-w-[300px] text-center text-xs leading-relaxed text-stone-500">
                         {t.support.aiHint}
                       </p>
+                      <div className="mt-6 w-full max-w-[360px]">
+                        <p className="mb-2 text-center text-[10px] font-semibold uppercase tracking-wider text-stone-400">
+                          {t.support.title}
+                        </p>
+                        {suggestionPills}
+                      </div>
                     </div>
                   ) : (
                     <div className="space-y-3 px-4 py-4">
