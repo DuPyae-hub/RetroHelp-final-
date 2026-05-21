@@ -5,20 +5,18 @@ import { useAuth } from '../context/AuthContext'
 import { isCommunityMember } from '../constants/roles'
 import { useLanguage } from '../i18n/LanguageContext'
 import type { ArtCenterDetail, ArtCenterSearchItem } from '../types/api'
+import {
+  fetchDrivingRoute,
+  formatRouteSummary,
+  type DrivingRoute,
+} from '../lib/drivingRoute'
+import { externalDirectionLinks } from '../lib/mapLinks'
 import { ClinicMapPanel } from './ClinicMapPanel'
 
 function parseCoord(v: string | number | null | undefined): number | null {
   if (v === null || v === undefined || v === '') return null
   const n = typeof v === 'number' ? v : Number.parseFloat(String(v))
   return Number.isFinite(n) ? n : null
-}
-
-function externalDirectionLinks(lat: number, lng: number) {
-  const dest = `${lat},${lng}`
-  return {
-    google: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}`,
-    apple: `https://maps.apple.com/?daddr=${encodeURIComponent(dest)}&dirflg=d`,
-  }
 }
 
 export function ClinicSearchForm({
@@ -46,6 +44,9 @@ export function ClinicSearchForm({
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
   const [locating, setLocating] = useState(false)
   const [locationError, setLocationError] = useState<string | null>(null)
+  const [drivingRoute, setDrivingRoute] = useState<DrivingRoute | null>(null)
+  const [routeLoading, setRouteLoading] = useState(false)
+  const [routeFailed, setRouteFailed] = useState(false)
 
   const isPatient = user && token && isCommunityMember(user.role_id)
 
@@ -96,6 +97,8 @@ export function ClinicSearchForm({
       setRecordOk(null)
       setBookingMsg(null)
       setBookingOk(null)
+      setDrivingRoute(null)
+      setRouteFailed(false)
       if (!isPatient) {
         return
       }
@@ -138,6 +141,8 @@ export function ClinicSearchForm({
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setDrivingRoute(null)
+        setRouteFailed(false)
         setLocating(false)
       },
       () => {
@@ -147,6 +152,49 @@ export function ClinicSearchForm({
       { enableHighAccuracy: true, timeout: 10000 },
     )
   }
+
+  const clinicLat = detail ? parseCoord(detail.latitude) : null
+  const clinicLng = detail ? parseCoord(detail.longitude) : null
+
+  useEffect(() => {
+    if (!userLocation || clinicLat === null || clinicLng === null) {
+      setDrivingRoute(null)
+      setRouteFailed(false)
+      setRouteLoading(false)
+      return
+    }
+
+    const controller = new AbortController()
+    setRouteLoading(true)
+    setRouteFailed(false)
+
+    void fetchDrivingRoute(
+      userLocation,
+      { lat: clinicLat, lng: clinicLng },
+      controller.signal,
+    )
+      .then((route) => {
+        if (controller.signal.aborted) return
+        setDrivingRoute(route)
+        setRouteFailed(route === null)
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDrivingRoute(null)
+          setRouteFailed(true)
+        }
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setRouteLoading(false)
+      })
+
+    return () => controller.abort()
+  }, [userLocation, clinicLat, clinicLng])
+
+  const routeSummary =
+    drivingRoute && userLocation
+      ? formatRouteSummary(drivingRoute.distanceMeters, drivingRoute.durationSeconds)
+      : null
 
   const recordVisit = async () => {
     if (!selectedId || !isPatient) return
@@ -371,11 +419,17 @@ export function ClinicSearchForm({
               </div>
               <ClinicMapPanel
                 name={detail.name}
-                latitude={parseCoord(detail.latitude)}
-                longitude={parseCoord(detail.longitude)}
+                latitude={clinicLat}
+                longitude={clinicLng}
                 noCoordsLabel={t.findClinic.noCoords}
                 userLatitude={userLocation?.lat ?? null}
                 userLongitude={userLocation?.lng ?? null}
+                drivingRoute={drivingRoute}
+                routeLoading={routeLoading}
+                routeLoadingLabel={t.findClinic.routeLoading}
+                routeSummary={routeSummary}
+                turnByTurnTitle={t.findClinic.turnByTurnTitle}
+                routeFailedLabel={routeFailed ? t.findClinic.routeFailed : undefined}
               />
               <div className="rounded-2xl border border-teal-100/90 bg-teal-50/45 p-3">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -393,10 +447,12 @@ export function ClinicSearchForm({
                 {locationError ? <p className="mt-2 text-xs text-rose-700">{locationError}</p> : null}
               </div>
               {(() => {
-                const lat = parseCoord(detail.latitude)
-                const lng = parseCoord(detail.longitude)
-                if (lat === null || lng === null) return null
-                const { google, apple } = externalDirectionLinks(lat, lng)
+                if (clinicLat === null || clinicLng === null) return null
+                const { google, apple } = externalDirectionLinks(
+                  clinicLat,
+                  clinicLng,
+                  userLocation,
+                )
                 return (
                   <div className="rounded-2xl border border-teal-100/90 bg-teal-50/50 p-4">
                     <p className="text-sm font-semibold text-teal-950">

@@ -78,9 +78,12 @@ export const translations = {
       noCoords:
         'This listing has no map coordinates yet. You can still record your visit for your records.',
       directionsIntro: 'Turn-by-turn directions in your maps app:',
-      siteDirectionsTitle: 'Get directions inside this page',
+      siteDirectionsTitle: 'Driving directions on the map',
       siteDirectionsHint:
-        'Tap "Use my location" to draw a live route line from your current location to this clinic.',
+        'Tap "Use my location" to load a real road route (like Google Maps), with distance, time, and turn-by-turn steps. You can also open the same trip in Google or Apple Maps.',
+      routeLoading: 'Calculating driving route…',
+      routeFailed: 'Could not load the road route. Try again or open Google Maps below.',
+      turnByTurnTitle: 'Turn-by-turn directions',
       useMyLocation: 'Use my location',
       locating: 'Getting location…',
       locationDenied: 'Location permission was denied. Please allow location access and try again.',
@@ -615,9 +618,12 @@ export const translations = {
       noCoords:
         'ဤစာရင်းတွင် မြေပုံကိုဩဒိနိတ်မရှိသေးပါ။ မှတ်တမ်းတင်ခြင်းကို ဆက်လုပ်နိုင်ပါသည်။',
       directionsIntro: 'မြေပုံအက်ပ်တွင် လမ်းညွှန်ချက်များ ဖွင့်ရန်။',
-      siteDirectionsTitle: 'ဤစာမျက်နှာပေါ်တွင် တိုက်ရိုက်လမ်းညွှန်',
+      siteDirectionsTitle: 'မြေပုံပေါ်တွင် ယာဉ်မောင်းလမ်းညွှန်',
       siteDirectionsHint:
-        '"ကျွန်ုပ်တည်နေရာသုံးရန်" ကိုနှိပ်ပါက သင့်တည်နေရာမှ ဤဆေးခန်းသို့ လမ်းကြောင်းလိုင်းကို တိုက်ရိုက်ပြပါမည်။',
+        '"ကျွန်ုပ်တည်နေရာသုံးရန်" ကိုနှိပ်ပါက Google Maps ကဲ့သို့ လမ်းအမှန်ဖြင့် ခရီးအကွာအဝေး၊ အချိန်နှင့် အဆင့်ဆင့်လမ်းညွှန်ချက်များ ပြပါမည်။ Google သို့မဟုတ် Apple Maps ဖြင့်လည်း ဖွင့်နိုင်ပါသည်။',
+      routeLoading: 'ယာဉ်မောင်းလမ်းကြောင်း တွက်ချက်နေသည်…',
+      routeFailed: 'လမ်းကြောင်း မဖတ်ရပါ။ ထပ်စမ်းပါ သို့မဟုတ် အောက်တွင် Google Maps ဖွင့်ပါ။',
+      turnByTurnTitle: 'အဆင့်ဆင့် လမ်းညွှန်ချက်များ',
       useMyLocation: 'ကျွန်ုပ်တည်နေရာ သုံးရန်',
       locating: 'တည်နေရာ ရယူနေသည်…',
       locationDenied: 'တည်နေရာခွင့်ပြုချက် မရပါ။ ခွင့်ပြုပြီး ထပ်စမ်းပါ။',
