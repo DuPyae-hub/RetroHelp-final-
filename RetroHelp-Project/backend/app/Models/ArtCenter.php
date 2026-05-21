@@ -53,4 +53,20 @@ class ArtCenter extends Model
     {
         return $this->hasMany(Booking::class, 'art_center_id');
     }
+
+    /**
+     * Reduce 3-month supply count by one after a completed pill handout.
+     * Sets art_pills_available to false when count reaches zero.
+     */
+    public function decrementPillSupply(int $amount = 1): void
+    {
+        $amount = max(1, $amount);
+        $current = max(0, (int) $this->art_pills_count);
+        $next = max(0, $current - $amount);
+
+        $this->update([
+            'art_pills_count' => $next,
+            'art_pills_available' => $next > 0,
+        ]);
+    }
 }

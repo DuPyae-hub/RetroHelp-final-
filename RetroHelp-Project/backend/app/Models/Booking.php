@@ -40,6 +40,7 @@ class Booking extends Model
         'respond_by_at',
         'cancelled_at',
         'cancellation_reason',
+        'pill_stock_deducted',
     ];
 
     /**
@@ -72,6 +73,7 @@ class Booking extends Model
             'accepted_at' => 'datetime',
             'respond_by_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'pill_stock_deducted' => 'boolean',
         ];
     }
 

@@ -252,8 +252,16 @@ class BookingController extends Controller
             return response()->json(['message' => 'Patient must be marked arrived first.'], 422);
         }
 
-        $booking->update(['status' => Booking::STATUS_PILL_GIVEN]);
-        $booking->load(['patient:id,full_name,nickname', 'artCenter:id,name', 'navigation']);
+        DB::transaction(function () use ($booking): void {
+            $booking->update(['status' => Booking::STATUS_PILL_GIVEN]);
+            $this->deductPillStockOnce($booking);
+        });
+
+        $booking->refresh()->load([
+            'patient:id,full_name,nickname',
+            'artCenter:id,name,township,area,art_pills_available,art_pills_count',
+            'navigation',
+        ]);
 
         return response()->json([
             'message' => 'Recorded: arrived and pill given.',
@@ -284,6 +292,7 @@ class BookingController extends Controller
 
         DB::transaction(function () use ($booking, $request, $data): void {
             $booking->update(['status' => Booking::STATUS_COMPLETED]);
+            $this->deductPillStockOnce($booking);
 
             if (isset($data['rating'])) {
                 Review::query()->create([
@@ -298,7 +307,11 @@ class BookingController extends Controller
             }
         });
 
-        $booking->refresh()->load(['artCenter:id,name,township,area,latitude,longitude', 'review', 'navigation']);
+        $booking->refresh()->load([
+            'artCenter:id,name,township,area,latitude,longitude,art_pills_available,art_pills_count',
+            'review',
+            'navigation',
+        ]);
 
         return response()->json([
             'message' => 'Visit completed.',
@@ -404,5 +417,32 @@ class BookingController extends Controller
             'rating_avg' => round((float) ($row->avg_rating ?? 0), 2),
             'total_reviews' => (int) ($row->cnt ?? 0),
         ]);
+    }
+
+    /**
+     * Lower clinic pill supply once per booking (pill given or visit completed).
+     */
+    private function deductPillStockOnce(Booking $booking): void
+    {
+        $booking->refresh();
+
+        if (Schema::hasColumn('bookings', 'pill_stock_deducted') && $booking->pill_stock_deducted) {
+            return;
+        }
+
+        $center = ArtCenter::query()
+            ->whereKey($booking->art_center_id)
+            ->lockForUpdate()
+            ->first();
+
+        if ($center === null) {
+            return;
+        }
+
+        $center->decrementPillSupply();
+
+        if (Schema::hasColumn('bookings', 'pill_stock_deducted')) {
+            $booking->update(['pill_stock_deducted' => true]);
+        }
     }
 }

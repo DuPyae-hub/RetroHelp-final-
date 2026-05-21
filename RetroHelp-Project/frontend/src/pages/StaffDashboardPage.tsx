@@ -234,12 +234,34 @@ export function StaffDashboardPage() {
     return b.patient?.full_name ?? '—'
   }
 
+  const refreshClinicAvailability = async () => {
+    if (targetCenterId == null) return
+    try {
+      const { data } = await api.get<{
+        data: {
+          art_pills_available?: boolean
+          art_pills_count?: number
+          art_three_month_people_count?: number
+        }
+      }>(`/api/art-centers/${targetCenterId}`)
+      setAvailabilityAvailable(Boolean(data?.data?.art_pills_available))
+      setAvailabilityCount(
+        Math.max(0, Number(data?.data?.art_three_month_people_count ?? data?.data?.art_pills_count ?? 0)),
+      )
+    } catch {
+      /* keep previous counts if refresh fails */
+    }
+  }
+
   const patchBooking = async (bookingId: number, path: 'accept' | 'pill-given' | 'cancel') => {
     setBusyBookingId(bookingId)
     setBookingsError(null)
     try {
       await api.patch(`/api/bookings/${bookingId}/${path}`)
       await loadBookings()
+      if (path === 'pill-given') {
+        await refreshClinicAvailability()
+      }
     } catch (err) {
       setBookingsError(getApiErrorMessage(err))
     } finally {
