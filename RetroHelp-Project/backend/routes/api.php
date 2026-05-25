@@ -45,6 +45,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/bookings', [BookingController::class, 'store']);
         Route::patch('/bookings/{booking}/on-my-way', [BookingController::class, 'onMyWay']);
         Route::patch('/bookings/{booking}/arrived', [BookingController::class, 'arrived']);
+        Route::post('/bookings/{booking}/review', [BookingController::class, 'storeReview']);
         Route::patch('/bookings/{booking}/complete', [BookingController::class, 'complete']);
 
         Route::get('/navigations', [NavigationController::class, 'index']);

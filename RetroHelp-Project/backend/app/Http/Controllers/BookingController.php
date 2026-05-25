@@ -23,7 +23,12 @@ class BookingController extends Controller
         if ($user->isPatient()) {
             $bookings = Booking::query()
                 ->where('user_id', $user->id)
-                ->with(['artCenter:id,name,township,area,latitude,longitude', 'staff:id,full_name,nickname', 'navigation'])
+                ->with([
+                    'artCenter:id,name,township,area,latitude,longitude',
+                    'staff:id,full_name,nickname',
+                    'navigation',
+                    'review:id,booking_id,rating,comment,created_at',
+                ])
                 ->orderByDesc('created_at')
                 ->limit(100)
                 ->get();
@@ -269,6 +274,53 @@ class BookingController extends Controller
         ]);
     }
 
+    /**
+     * Save a clinic review and finish the visit (preferred path from Profile UI).
+     */
+    public function storeReview(Request $request, Booking $booking): JsonResponse
+    {
+        $this->authorizePatientOwner($request, $booking);
+
+        if ($booking->status === Booking::STATUS_CANCELLED) {
+            return response()->json(['message' => 'This request was cancelled.'], 422);
+        }
+
+        if (! in_array($booking->status, [Booking::STATUS_PILL_GIVEN, Booking::STATUS_COMPLETED], true)) {
+            return response()->json([
+                'message' => 'You can review after the clinic marks pill given.',
+            ], 422);
+        }
+
+        if ($booking->review()->exists()) {
+            return response()->json(['message' => 'A review was already submitted for this booking.'], 422);
+        }
+
+        $data = $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'comment' => ['nullable', 'string', 'max:5000'],
+        ]);
+
+        DB::transaction(function () use ($booking, $request, $data): void {
+            if ($booking->status === Booking::STATUS_PILL_GIVEN) {
+                $booking->update(['status' => Booking::STATUS_COMPLETED]);
+                $this->deductPillStockOnce($booking);
+            }
+
+            $this->persistReviewForBooking($booking, (int) $request->user()->id, $data);
+        });
+
+        $booking->refresh()->load([
+            'artCenter:id,name,township,area,latitude,longitude,art_pills_available,art_pills_count',
+            'review',
+            'navigation',
+        ]);
+
+        return response()->json([
+            'message' => 'Thank you — your review was saved.',
+            'data' => $booking,
+        ], 201);
+    }
+
     public function complete(Request $request, Booking $booking): JsonResponse
     {
         $this->authorizePatientOwner($request, $booking);
@@ -286,7 +338,7 @@ class BookingController extends Controller
             'comment' => ['nullable', 'string', 'max:5000'],
         ]);
 
-        if (isset($data['rating']) && $booking->review()->exists()) {
+        if ($request->filled('rating') && $booking->review()->exists()) {
             return response()->json(['message' => 'A review was already submitted for this booking.'], 422);
         }
 
@@ -294,16 +346,8 @@ class BookingController extends Controller
             $booking->update(['status' => Booking::STATUS_COMPLETED]);
             $this->deductPillStockOnce($booking);
 
-            if (isset($data['rating'])) {
-                Review::query()->create([
-                    'user_id' => $request->user()->id,
-                    'clinic_id' => $booking->art_center_id,
-                    'booking_id' => $booking->id,
-                    'rating' => $data['rating'],
-                    'comment' => $data['comment'] ?? null,
-                ]);
-
-                $this->syncClinicRatingFromReviews($booking->art_center_id);
+            if ($request->filled('rating')) {
+                $this->persistReviewForBooking($booking, (int) $request->user()->id, $data);
             }
         });
 
@@ -403,6 +447,31 @@ class BookingController extends Controller
             return;
         }
         abort(403, 'Forbidden.');
+    }
+
+    /**
+     * @param  array{rating: int, comment?: string|null}  $data
+     */
+    private function persistReviewForBooking(Booking $booking, int $userId, array $data): void
+    {
+        if (! Schema::hasTable('reviews')) {
+            throw new \RuntimeException('Reviews table is missing. Run php artisan migrate.');
+        }
+
+        $payload = [
+            'user_id' => $userId,
+            'clinic_id' => $booking->art_center_id,
+            'rating' => (int) $data['rating'],
+            'comment' => isset($data['comment']) && $data['comment'] !== '' ? $data['comment'] : null,
+        ];
+
+        if (Schema::hasColumn('reviews', 'booking_id')) {
+            $payload['booking_id'] = $booking->id;
+        }
+
+        Review::query()->create($payload);
+
+        $this->syncClinicRatingFromReviews($booking->art_center_id);
     }
 
     private function syncClinicRatingFromReviews(int $clinicId): void

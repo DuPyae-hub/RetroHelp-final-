@@ -16,6 +16,10 @@ class PublicReviewController extends Controller
         $limit = (int) $request->query('limit', 8);
         $limit = max(1, min($limit, 30));
 
+        if (! \Illuminate\Support\Facades\Schema::hasTable('reviews')) {
+            return response()->json(['data' => []]);
+        }
+
         $rows = Review::query()
             ->with([
                 'clinic:id,name,township,area,rating_avg,total_reviews',

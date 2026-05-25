@@ -349,6 +349,8 @@ export const translations = {
       reviewSubmit: 'Submit review & finish visit',
       reviewSkip: 'Finish visit without rating',
       reviewCancel: 'Cancel',
+      reviewSavedNote: 'Your review was saved for this clinic',
+      reviewAddButton: 'Leave a review for this clinic',
       bookingProgressLabel: 'Progress',
       respondByIntro:
         'Clinic approved this visit. Tap I’m coming before this time (your device’s local time) or the request will cancel:',
@@ -905,6 +907,8 @@ export const translations = {
       reviewSubmit: 'သုံးသပ်ချက် ပို့ပြီး လည်ပတ်မှု ပြီးမြောက်ရန်',
       reviewSkip: 'အဆင့်မပေးဘဲ ပြီးမြောက်ရန်',
       reviewCancel: 'ပယ်ဖျက်ရန်',
+      reviewSavedNote: 'ဤဆေးခန်းအတွက် သုံးသပ်ချက် သိမ်းပြီးပါပြီ',
+      reviewAddButton: 'ဤဆေးခန်းအတွက် သုံးသပ်ချက် ရေးရန်',
       bookingProgressLabel: 'တိုးတက်မှု',
       respondByIntro:
         'ဆေးခန်းက လက်ခံပြီးပါပြီ။ သင့်စက်ပေါ်ရှိ ဒေသစာဖြင့် ဤအချိန်မတိုင်မီ “လာမည် — ခရီးစ” ကို နှိပ်ပါ—မဟုတ်ပါက တောင်းဆိုမှု ပယ်ဖျက်မည်။',

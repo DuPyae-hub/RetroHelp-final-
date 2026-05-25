@@ -271,13 +271,15 @@ export function PatientRecordsPanel() {
     setBusyBookingId(bookingId)
     setError(null)
     try {
-      const body: { rating?: number; comment?: string } = {}
       if (withRating && reviewRating >= 1 && reviewRating <= 5) {
-        body.rating = reviewRating
         const trimmed = reviewComment.trim()
-        if (trimmed) body.comment = trimmed
+        await api.post(`/api/bookings/${bookingId}/review`, {
+          rating: reviewRating,
+          comment: trimmed || null,
+        })
+      } else {
+        await api.patch(`/api/bookings/${bookingId}/complete`, {})
       }
-      await api.patch(`/api/bookings/${bookingId}/complete`, body)
       setReviewForId(null)
       setReviewRating(0)
       setReviewComment('')
@@ -386,7 +388,14 @@ export function PatientRecordsPanel() {
               : t.profile.bookingActionArrived}
           </button>
         )}
-        {b.status === 'pill_given' && reviewForId !== b.id && (
+        {b.status === 'completed' && b.review && (
+          <p className="mt-3 rounded-2xl border border-teal-100 bg-teal-50/90 px-3 py-2 text-xs text-teal-900">
+            {t.profile.reviewSavedNote} ({'★'.repeat(b.review.rating)})
+            {b.review.comment ? ` — “${b.review.comment}”` : ''}
+          </p>
+        )}
+        {(b.status === 'pill_given' || (b.status === 'completed' && !b.review)) &&
+          reviewForId !== b.id && (
           <div className="mt-4 space-y-2">
             <p className="text-xs leading-relaxed text-stone-600">{t.profile.bookingCompleteNote}</p>
             <button
@@ -395,11 +404,11 @@ export function PatientRecordsPanel() {
               onClick={() => openReviewForm(b.id)}
               className="w-full rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-2.5 text-sm font-semibold text-white shadow-md disabled:opacity-60"
             >
-              {t.profile.bookingActionComplete}
+              {b.status === 'completed' ? t.profile.reviewAddButton : t.profile.bookingActionComplete}
             </button>
           </div>
         )}
-        {b.status === 'pill_given' && reviewForId === b.id && (
+        {(b.status === 'pill_given' || b.status === 'completed') && reviewForId === b.id && (
           <div className="mt-4 rounded-2xl border border-teal-200 bg-teal-50/80 p-4">
             <p className="text-sm font-semibold text-teal-950">{t.profile.reviewPrompt}</p>
             <p className="mt-2 text-xs text-stone-600">{t.profile.reviewStarsLabel}</p>
@@ -438,14 +447,16 @@ export function PatientRecordsPanel() {
               >
                 {busyBookingId === b.id ? t.profile.bookingActionWorking : t.profile.reviewSubmit}
               </button>
-              <button
-                type="button"
-                disabled={busyBookingId === b.id}
-                onClick={() => void completeWithReview(b.id, false)}
-                className="rounded-2xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 disabled:opacity-50"
-              >
-                {t.profile.reviewSkip}
-              </button>
+              {b.status === 'pill_given' ? (
+                <button
+                  type="button"
+                  disabled={busyBookingId === b.id}
+                  onClick={() => void completeWithReview(b.id, false)}
+                  className="rounded-2xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 disabled:opacity-50"
+                >
+                  {t.profile.reviewSkip}
+                </button>
+              ) : null}
             </div>
             <button
               type="button"

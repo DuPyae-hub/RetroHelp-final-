@@ -91,6 +91,14 @@ export type NavigationLogItem = {
   } | null
 }
 
+export type BookingReview = {
+  id: number
+  booking_id?: number
+  rating: number
+  comment: string | null
+  created_at: string | null
+}
+
 export type PatientBookingRow = {
   id: number
   user_id: number
@@ -105,6 +113,7 @@ export type PatientBookingRow = {
   cancellation_reason: string | null
   created_at: string | null
   updated_at: string | null
+  review?: BookingReview | null
   art_center?: {
     id: number
     name: string
