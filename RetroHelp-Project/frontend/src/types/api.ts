@@ -3,9 +3,26 @@ export type ResourceLibraryItem = {
   title: string
   content: string | null
   ebook_url?: string | null
+  cover_image_url?: string | null
   category: string | null
   created_at: string | null
   updated_at: string | null
+}
+
+export type ClinicReviewItem = {
+  id: number
+  rating: number
+  comment: string | null
+  created_at: string | null
+  author_label: string
+  clinic: {
+    id: number
+    name: string
+    township: string | null
+    area: string | null
+    rating_avg: string | number | null
+    total_reviews: number
+  } | null
 }
 
 export type TopRankedClinic = {

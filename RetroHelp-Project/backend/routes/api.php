@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\PublicOverviewController;
+use App\Http\Controllers\PublicReviewController;
 use App\Http\Controllers\ResourceLibraryController;
 use App\Http\Controllers\SupportChatController;
 use Illuminate\Support\Facades\Route;
@@ -16,6 +17,7 @@ Route::get('/art-centers/top-ranked', [ArtCenterController::class, 'topRanked'])
 Route::get('/art-centers/search', [ArtCenterController::class, 'search']);
 Route::get('/resource-libraries', [ResourceLibraryController::class, 'index']);
 Route::get('/overview/public', [PublicOverviewController::class, 'show']);
+Route::get('/reviews/recent', [PublicReviewController::class, 'recent']);
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/register/patient', [AuthController::class, 'registerPatient']);

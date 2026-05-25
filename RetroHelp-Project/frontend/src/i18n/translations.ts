@@ -43,6 +43,15 @@ export const translations = {
       clinicsLoading: 'Loading clinics…',
       clinicsEmpty: 'No clinics to show yet.',
       reviewsLabel: 'reviews',
+      reviewsSectionTitle: 'Clinic reviews from the community',
+      reviewsSectionSub:
+        'Real feedback left after completed visits. Ratings help you compare ART centres before you go.',
+      reviewsEmpty:
+        'No reviews yet. After you finish a visit, you can leave a rating from your Profile.',
+      reviewsLoading: 'Loading reviews…',
+      reviewsAnonymousNote: 'Only nicknames are shown — not legal names.',
+      libraryViewAll: 'Open full library',
+      libraryFeatured: 'Featured read',
       homeLibraryTitle: 'Mental support library',
       homeLibrarySub:
         'Short, welcoming reads on treatment routines and coping—education only, not a substitute for your care team.',
@@ -582,6 +591,15 @@ export const translations = {
       clinicsLoading: 'ဆေးခန်းများ ဖတ်နေသည်…',
       clinicsEmpty: 'ပြသရန် ဆေးခန်းမရှိသေးပါ။',
       reviewsLabel: 'သုံးသပ်ချက်များ',
+      reviewsSectionTitle: 'အသိုင်းအဝိုင်းမှ ဆေးခန်းသုံးသပ်ချက်များ',
+      reviewsSectionSub:
+        'လည်ပတ်မှု ပြီးစီးပြီးနောက် ထားသော အမှန်တကယ် အကြံပြုချက်များ။ ART စင်တာများကို နှိုင်းယှဉ်ရန် ကူညီပါသည်။',
+      reviewsEmpty:
+        'သုံးသပ်ချက် မရှိသေးပါ။ လည်ပတ်မှု ပြီးပါက ကိုယ်ရေးအချက်အလက်မှ ကြယ်ပွင့် ထည့်နိုင်ပါသည်။',
+      reviewsLoading: 'သုံးသပ်ချက်များ ဖတ်နေသည်…',
+      reviewsAnonymousNote: 'အမည်ပြောင်သာ ပြပါသည် — ဥပဒေအမည် မဟုတ်ပါ။',
+      libraryViewAll: 'စာကြည့်တိုက် အပြည့်အစုံ',
+      libraryFeatured: 'ထင်ရှားသော ဖတ်ရှုရန်',
       homeLibraryTitle: 'စိတ်ပိုင်းဆိုင်ရာ ပံ့ပိုးမှု စာကြည့်တိုက်',
       homeLibrarySub:
         'ဆေးပုံစံနှင့် ခံစားချက်စီမံခန့်ခွဲမှု အကြောင်း ဖတ်ရှုရလွယ်ကူပြီး နွေးထွေးသော စာများ—ပညာရေးသာ၊ ဆရာဝန်ညွှန်ကြားချက်မဟုတ်ပါ။',

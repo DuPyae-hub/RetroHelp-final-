@@ -1,9 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../api/client'
-import { AnimatedClinicMascot, AnimatedLibraryMascot } from '../components/AnimatedSectionMascots'
+import { AnimatedClinicMascot } from '../components/AnimatedSectionMascots'
 import { BookingStatusMascot } from '../components/BookingStatusMascot'
+import { HomeClinicReviewsSection } from '../components/HomeClinicReviewsSection'
+import { HomeLibrarySection } from '../components/HomeLibrarySection'
 import { useSupportOpener } from '../context/SupportOpenerContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import {
@@ -15,8 +17,12 @@ import {
   staggerContainer,
   staggerItem,
 } from '../lib/motionPresets'
-import { partitionResourceLibrary } from '../lib/resourceLibraryCategory'
-import type { HomeOverviewStats, ResourceLibraryItem, TopRankedClinic } from '../types/api'
+import type {
+  ClinicReviewItem,
+  HomeOverviewStats,
+  ResourceLibraryItem,
+  TopRankedClinic,
+} from '../types/api'
 
 function formatRating(avg: string | number | null | undefined): string {
   if (avg === null || avg === undefined || avg === '') return '—'
@@ -39,6 +45,8 @@ export function HomePage() {
   const [libraryError, setLibraryError] = useState<string | null>(null)
   const [article, setArticle] = useState<ResourceLibraryItem | null>(null)
   const [overview, setOverview] = useState<HomeOverviewStats | null>(null)
+  const [reviews, setReviews] = useState<ClinicReviewItem[] | null>(null)
+  const [reviewsError, setReviewsError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -103,10 +111,28 @@ export function HomePage() {
     }
   }, [])
 
-  const { basics, care, other } = useMemo(
-    () => partitionResourceLibrary(library ?? []),
-    [library],
-  )
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      try {
+        const { data } = await api.get<{ data: ClinicReviewItem[] }>(
+          '/api/reviews/recent?limit=6',
+        )
+        if (!cancelled) {
+          setReviews(Array.isArray(data?.data) ? data.data : [])
+          setReviewsError(null)
+        }
+      } catch (e) {
+        if (!cancelled) {
+          setReviewsError(getApiErrorMessage(e))
+          setReviews([])
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   const onKeyModal = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') setArticle(null)
@@ -228,7 +254,9 @@ export function HomePage() {
               </motion.article>
               <motion.article variants={staggerItem} className={`${glassPanel} p-8 lg:p-9`}>
                 <div className="mb-4 flex items-center justify-between gap-3">
-                  <AnimatedLibraryMascot className="h-16 w-16" />
+                  <span className="flex h-16 w-16 items-center justify-center rounded-2xl bg-teal-100 text-3xl">
+                    💊
+                  </span>
                   <p className="text-3xl font-extrabold text-stone-900 tabular-nums">
                     {formatCount(overview?.pill_given_count ?? null)}
                   </p>
@@ -415,71 +443,38 @@ export function HomePage() {
           </div>
         </section>
 
-        {/* Library — bento grid, visually continuous from clinics */}
-        <section className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <div className="mb-12 flex flex-col items-start gap-6 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-              className="max-w-2xl"
-            >
-              <h2 className="text-2xl font-extrabold text-stone-900 sm:text-3xl">
-                {t.home.homeLibraryTitle}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-stone-600 sm:text-base">
-                {t.home.homeLibrarySub}
-              </p>
-            </motion.div>
-            <motion.div
-              variants={fadeUp}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: '-50px' }}
-              className="mx-auto shrink-0 sm:mx-0"
-            >
-              <AnimatedLibraryMascot className="h-28 w-28 sm:h-32 sm:w-32" />
-            </motion.div>
-          </div>
+        <HomeClinicReviewsSection
+          reviews={reviews}
+          error={reviewsError}
+          labels={{
+            title: t.home.reviewsSectionTitle,
+            subtitle: t.home.reviewsSectionSub,
+            empty: t.home.reviewsEmpty,
+            loading: t.home.reviewsLoading,
+            findClinic: t.nav.findClinic,
+            anonymousNote: t.home.reviewsAnonymousNote,
+          }}
+        />
 
-          {libraryError && (
-            <p className="mb-6 rounded-[1.75rem] border border-rose-200/60 bg-rose-50/80 px-5 py-3 text-sm text-rose-800 backdrop-blur-md">
-              {libraryError}
-            </p>
-          )}
-
-          {library == null ? (
-            <p className={`px-6 py-12 text-center text-stone-600 ${glassPanel}`}>
-              {t.library.loading}
-            </p>
-          ) : (
-            <div className="space-y-16">
-              <LibraryBento
-                title={t.library.basics}
-                items={basics}
-                empty={t.library.emptyBasics}
-                onOpen={setArticle}
-                readLabel={t.home.readArticle}
-              />
-              <LibraryBento
-                title={t.library.care}
-                items={care}
-                empty={t.library.emptyCare}
-                onOpen={setArticle}
-                readLabel={t.home.readArticle}
-              />
-              {other.length > 0 ? (
-                <LibraryBento
-                  title={t.library.other}
-                  items={other}
-                  empty={t.library.emptyOther}
-                  onOpen={setArticle}
-                  readLabel={t.home.readArticle}
-                />
-              ) : null}
-            </div>
-          )}
+        <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
+          <HomeLibrarySection
+            items={library ?? []}
+            loading={library == null}
+            error={libraryError}
+            labels={{
+              title: t.home.homeLibraryTitle,
+              subtitle: t.home.homeLibrarySub,
+              viewAll: t.home.libraryViewAll,
+              tabBasics: t.library.basics,
+              tabCare: t.library.care,
+              emptyBasics: t.library.emptyBasics,
+              emptyCare: t.library.emptyCare,
+              read: t.home.readArticle,
+              loading: t.library.loading,
+              featured: t.home.libraryFeatured,
+            }}
+            onOpenArticle={setArticle}
+          />
         </section>
       </div>
 
@@ -532,83 +527,6 @@ export function HomePage() {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
-  )
-}
-
-function LibraryBento({
-  title,
-  items,
-  empty,
-  onOpen,
-  readLabel,
-}: {
-  title: string
-  items: ResourceLibraryItem[]
-  empty: string
-  onOpen: (item: ResourceLibraryItem) => void
-  readLabel: string
-}) {
-  if (items.length === 0) {
-    return (
-      <div>
-        <h3 className="mb-5 text-xl font-bold text-teal-900">{title}</h3>
-        <p className={`rounded-[2rem] border border-dashed border-orange-200/80 px-6 py-10 text-center text-sm text-stone-600 ${glassPanel}`}>
-          {empty}
-        </p>
-      </div>
-    )
-  }
-
-  return (
-    <div>
-      <motion.h3
-        variants={fadeUp}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        className="mb-5 text-xl font-bold text-teal-900"
-      >
-        {title}
-      </motion.h3>
-      <motion.div
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, margin: '-30px' }}
-        className="grid auto-rows-fr grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-5"
-      >
-        {items.map((item, i) => {
-          const featured = i === 0 && items.length > 1
-          return (
-            <motion.button
-              key={item.id}
-              type="button"
-              variants={staggerItem}
-              onClick={() => onOpen(item)}
-              className={`${glassPanel} flex flex-col p-5 text-left transition hover:border-teal-200/60 hover:shadow-xl sm:p-6 ${
-                featured ? 'col-span-2 min-h-[12rem] sm:min-h-[14rem]' : 'col-span-1'
-              }`}
-            >
-              <h4
-                className={`font-bold text-stone-900 ${featured ? 'text-lg sm:text-xl' : 'text-base'}`}
-              >
-                {item.title}
-              </h4>
-              {item.content ? (
-                <p
-                  className={`mt-2 text-sm leading-relaxed text-stone-600 ${featured ? 'line-clamp-5 sm:line-clamp-7' : 'line-clamp-3'}`}
-                >
-                  {item.content}
-                </p>
-              ) : null}
-              <span className="mt-auto pt-4 text-sm font-semibold text-teal-800">
-                {readLabel} →
-              </span>
-            </motion.button>
-          )
-        })}
-      </motion.div>
     </div>
   )
 }
