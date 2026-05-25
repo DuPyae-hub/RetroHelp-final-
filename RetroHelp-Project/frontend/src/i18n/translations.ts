@@ -342,6 +342,13 @@ export const translations = {
       bookingWaitClinic: 'Pending — waiting for the clinic to approve.',
       bookingWaitPill: 'Waiting for staff to record pill given.',
       bookingDone: 'Visit closed. Thank you.',
+      reviewPrompt: 'Rate this clinic (optional)',
+      reviewStarsLabel: 'Your star rating',
+      reviewCommentLabel: 'Short comment (optional)',
+      reviewCommentPlaceholder: 'What was helpful? Keep it general—no private medical details.',
+      reviewSubmit: 'Submit review & finish visit',
+      reviewSkip: 'Finish visit without rating',
+      reviewCancel: 'Cancel',
       bookingProgressLabel: 'Progress',
       respondByIntro:
         'Clinic approved this visit. Tap I’m coming before this time (your device’s local time) or the request will cancel:',
@@ -357,7 +364,7 @@ export const translations = {
       cancellationByPatient: 'You cancelled this request.',
       cancellationByClinic: 'The clinic cancelled this request.',
       bookingCompleteNote:
-        'After “pill given”, tap complete here. You can add a star rating when completing from a fuller flow later.',
+        'After the clinic marks pill given, open the review box here and finish your visit. Your review can appear on the home page.',
       cancellationNoComing:
         'Cancelled — you did not confirm you were coming before the deadline.',
       bookingStatus: {
@@ -398,8 +405,8 @@ export const translations = {
         'If you or someone else is in immediate danger or severe distress, use trusted local emergency or psychosocial services. Hotlines differ by region—keep the numbers you already rely on nearby.',
       hotline1Label: 'Psychosocial / crisis line (add your local number)',
       hotline1Number: '—',
-      hotline2Label: 'Medical / general emergency (example)',
-      hotline2Number: '999',
+      hotline2Label: 'Medical / general emergency',
+      hotline2Number: '09-781800488',
       languageHeading: 'Language',
       rights: '© RetroHelp. All rights reserved.',
     },
@@ -541,7 +548,7 @@ export const translations = {
       stepAsk: 'Ask how the app works or where to find a feature.',
       stepReply: 'Read the assistant reply—it shares general guidance, not personal medical instructions.',
       privacyNote:
-        'Emergency numbers on this page are placeholders until your organization publishes local contacts.',
+        'For psychosocial crisis support, use your trusted local line. Medical emergency: 09-781800488.',
     },
     lang: {
       english: 'English',
@@ -891,6 +898,13 @@ export const translations = {
       bookingWaitClinic: 'စောင့်ဆိုင်း — ဆေးခန်းလက်ခံချိန် စောင့်နေသည်။',
       bookingWaitPill: 'ဝန်ထမ်းက ဆေးပေးပြီးကြောင်း မှတ်သည့်အထိ စောင့်ဆိုင်းနေသည်။',
       bookingDone: 'လည်ပတ်မှု ပြီးပါပြီ။ ကျေးဇူးတင်ပါသည်။',
+      reviewPrompt: 'ဤဆေးခန်းကို အဆင့်သတ်မှတ်ပါ (မထည့်လည်းရ)',
+      reviewStarsLabel: 'ကြယ်ပွင့် အဆင့်',
+      reviewCommentLabel: 'အတိုချုံး မှတ်ချက် (မထည့်လည်းရ)',
+      reviewCommentPlaceholder: 'အကူအညီဖြစ်ခဲ့သည်ကို ရေးပါ—ကိုယ်ရေးဆေးပညာ အသေးစိတ် မရေးပါနှင့်။',
+      reviewSubmit: 'သုံးသပ်ချက် ပို့ပြီး လည်ပတ်မှု ပြီးမြောက်ရန်',
+      reviewSkip: 'အဆင့်မပေးဘဲ ပြီးမြောက်ရန်',
+      reviewCancel: 'ပယ်ဖျက်ရန်',
       bookingProgressLabel: 'တိုးတက်မှု',
       respondByIntro:
         'ဆေးခန်းက လက်ခံပြီးပါပြီ။ သင့်စက်ပေါ်ရှိ ဒေသစာဖြင့် ဤအချိန်မတိုင်မီ “လာမည် — ခရီးစ” ကို နှိပ်ပါ—မဟုတ်ပါက တောင်းဆိုမှု ပယ်ဖျက်မည်။',
@@ -906,7 +920,7 @@ export const translations = {
       cancellationByPatient: 'သင်က ဤတောင်းဆိုမှုကို ပယ်ဖျက်ခဲ့သည်။',
       cancellationByClinic: 'ဆေးခန်းက ဤတောင်းဆိုမှုကို ပယ်ဖျက်ခဲ့သည်။',
       bookingCompleteNote:
-        '“ဆေးပေးပြီး” ပြီးနောက် ဤနေရာတွင် ပြီးမြောက်ကြောင်း နှိပ်ပါ။ ကြယ်ပွင့်သုံးသပ်ချက် ထည့်လိုပါက နောက်ပိုင်းတွင် ထည့်သွင်းနိုင်ပါသည်။',
+        'ဆေးခန်းက ဆေးပေးပြီးမှတ်ပြီးနောက် ဤနေရာတွင် သုံးသပ်ချက် ဖြည့်ပြီး လည်ပတ်မှု ပြီးမြောက်ပါ။ သုံးသပ်ချက်သည် ပင်မစာမျက်နှာတွင် ပေါ်နိုင်ပါသည်။',
       cancellationNoComing:
         'ပယ်ဖျက်ပြီး — သတ်မှတ်ချိန်မတိုင်မီ လာမည်ကို အတည်မပြုပါ။',
       bookingStatus: {
@@ -947,8 +961,8 @@ export const translations = {
         'သင်ဒါမှမဟုတ် တစ်စုံတစ်ယောက်က အန္တရာယ် သို့မဟုတ် စိတ်ကျပ်တည်းမှုပြင်းထန်ပါက ယုံကြည်ရသော ဒေသတွင်း အရေးပေါ် သို့မဟုတ် စိတ်ပိုင်းဆိုင်ရာ ဝန်ဆောင်မှုများကို သုံးပါ။ ဖုန်းနံပါတ်များသည် ဒေသအလိုက် ကွဲပြားပါသည်။',
       hotline1Label: 'စိတ်ပိုင်းဆိုင်ရာ / အရေးပေါ် (ဒေသနံပါတ် ထည့်ပါ)',
       hotline1Number: '—',
-      hotline2Label: 'ဆေးပညာ အရေးပေါ် (ဥပမာ)',
-      hotline2Number: '999',
+      hotline2Label: 'ဆေးပညာ အရေးပေါ်',
+      hotline2Number: '09-781800488',
       languageHeading: 'ဘာသာစကား',
       rights: '© RetroHelp။ မူပိုင်ခွင့်ရှိပါသည်။',
     },
@@ -1092,7 +1106,7 @@ export const translations = {
       stepReply:
         'အကူအညီပေးသူ၏ အဖြေကို ဖတ်ပါ—အထွေထွေလမ်းညွှန်ချက်သာ ပေးပြီး ကိုယ်ရေးကိုယ်တာ ဆေးညွှန်ကြားချက် မဟုတ်ပါ။',
       privacyNote:
-        'ဤစာမျက်နှာရှိ အရေးပေါ်နံပါတ်များသည် သင်၏ အဖွဲ့အစည်းမထုတ်ပြမချင်း နေရာယူမှုပြသမှုသာဖြစ်သည်။',
+        'စိတ်ပိုင်းဆိုင်ရာ အရေးပေါ်အတွက် ယုံကြည်ရသော ဒေသတွင်း လိုင်းကို သုံးပါ။ ဆေးပညာအရေးပေါ် — 09-781800488။',
     },
     lang: {
       english: 'English',

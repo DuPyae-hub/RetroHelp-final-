@@ -158,6 +158,9 @@ export function PatientRecordsPanel() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [busyBookingId, setBusyBookingId] = useState<number | null>(null)
+  const [reviewForId, setReviewForId] = useState<number | null>(null)
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
   const [nowTick, setNowTick] = useState(0)
 
   useEffect(() => {
@@ -243,12 +246,41 @@ export function PatientRecordsPanel() {
 
   const runBookingAction = async (
     bookingId: number,
-    path: 'on-my-way' | 'arrived' | 'complete',
+    path: 'on-my-way' | 'arrived',
   ) => {
     setBusyBookingId(bookingId)
     setError(null)
     try {
       await api.patch(`/api/bookings/${bookingId}/${path}`, {})
+      await load()
+    } catch (err) {
+      setError(getApiErrorMessage(err))
+    } finally {
+      setBusyBookingId(null)
+    }
+  }
+
+  const openReviewForm = (bookingId: number) => {
+    setReviewForId(bookingId)
+    setReviewRating(0)
+    setReviewComment('')
+    setError(null)
+  }
+
+  const completeWithReview = async (bookingId: number, withRating: boolean) => {
+    setBusyBookingId(bookingId)
+    setError(null)
+    try {
+      const body: { rating?: number; comment?: string } = {}
+      if (withRating && reviewRating >= 1 && reviewRating <= 5) {
+        body.rating = reviewRating
+        const trimmed = reviewComment.trim()
+        if (trimmed) body.comment = trimmed
+      }
+      await api.patch(`/api/bookings/${bookingId}/complete`, body)
+      setReviewForId(null)
+      setReviewRating(0)
+      setReviewComment('')
       await load()
     } catch (err) {
       setError(getApiErrorMessage(err))
@@ -354,17 +386,75 @@ export function PatientRecordsPanel() {
               : t.profile.bookingActionArrived}
           </button>
         )}
-        {b.status === 'pill_given' && (
-          <button
-            type="button"
-            disabled={busyBookingId === b.id}
-            onClick={() => void runBookingAction(b.id, 'complete')}
-            className="mt-4 w-full rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-2.5 text-sm font-semibold text-white shadow-md disabled:opacity-60"
-          >
-            {busyBookingId === b.id
-              ? t.profile.bookingActionWorking
-              : t.profile.bookingActionComplete}
-          </button>
+        {b.status === 'pill_given' && reviewForId !== b.id && (
+          <div className="mt-4 space-y-2">
+            <p className="text-xs leading-relaxed text-stone-600">{t.profile.bookingCompleteNote}</p>
+            <button
+              type="button"
+              disabled={busyBookingId === b.id}
+              onClick={() => openReviewForm(b.id)}
+              className="w-full rounded-2xl bg-gradient-to-r from-teal-600 to-teal-700 py-2.5 text-sm font-semibold text-white shadow-md disabled:opacity-60"
+            >
+              {t.profile.bookingActionComplete}
+            </button>
+          </div>
+        )}
+        {b.status === 'pill_given' && reviewForId === b.id && (
+          <div className="mt-4 rounded-2xl border border-teal-200 bg-teal-50/80 p-4">
+            <p className="text-sm font-semibold text-teal-950">{t.profile.reviewPrompt}</p>
+            <p className="mt-2 text-xs text-stone-600">{t.profile.reviewStarsLabel}</p>
+            <div className="mt-2 flex gap-1" role="group" aria-label={t.profile.reviewStarsLabel}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setReviewRating(star)}
+                  className={`rounded-lg px-2 py-1 text-xl transition ${
+                    star <= reviewRating ? 'text-amber-500' : 'text-stone-300 hover:text-amber-300'
+                  }`}
+                  aria-pressed={star <= reviewRating}
+                  aria-label={`${star} stars`}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+            <label className="mt-3 block text-xs font-medium text-stone-700">
+              {t.profile.reviewCommentLabel}
+              <textarea
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                placeholder={t.profile.reviewCommentPlaceholder}
+                rows={3}
+                className="mt-1 w-full rounded-xl border border-orange-100 bg-white px-3 py-2 text-sm text-stone-800 outline-none ring-teal-500/30 focus:ring-2"
+              />
+            </label>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                disabled={busyBookingId === b.id || reviewRating < 1}
+                onClick={() => void completeWithReview(b.id, true)}
+                className="flex-1 rounded-2xl bg-teal-700 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                {busyBookingId === b.id ? t.profile.bookingActionWorking : t.profile.reviewSubmit}
+              </button>
+              <button
+                type="button"
+                disabled={busyBookingId === b.id}
+                onClick={() => void completeWithReview(b.id, false)}
+                className="rounded-2xl border border-stone-200 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 disabled:opacity-50"
+              >
+                {t.profile.reviewSkip}
+              </button>
+            </div>
+            <button
+              type="button"
+              className="mt-2 w-full text-xs text-stone-500 underline-offset-2 hover:underline"
+              onClick={() => setReviewForId(null)}
+            >
+              {t.profile.reviewCancel}
+            </button>
+          </div>
         )}
         {CANCELLABLE.has(b.status) && (
           <button
