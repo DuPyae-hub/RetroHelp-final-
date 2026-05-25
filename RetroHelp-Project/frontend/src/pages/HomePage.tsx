@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../api/client'
 import { AnimatedClinicMascot } from '../components/AnimatedSectionMascots'
@@ -17,6 +17,7 @@ import {
   staggerContainer,
   staggerItem,
 } from '../lib/motionPresets'
+import { RECENT_REVIEWS_EVENT } from '../lib/reviewsEvents'
 import type {
   ClinicReviewItem,
   HomeOverviewStats,
@@ -34,6 +35,34 @@ function formatRating(avg: string | number | null | undefined): string {
 function formatCount(value: number | null): string {
   if (value === null) return '...'
   return new Intl.NumberFormat().format(value)
+}
+
+function ratingToStars(avg: string | number | null | undefined): number {
+  const n = typeof avg === 'number' ? avg : Number.parseFloat(String(avg ?? ''))
+  if (!Number.isFinite(n)) return 5
+  return Math.min(5, Math.max(1, Math.round(n)))
+}
+
+function clinicsToReviewHighlights(clinics: TopRankedClinic[]): ClinicReviewItem[] {
+  return clinics
+    .filter((c) => (c.total_reviews ?? 0) > 0)
+    .slice(0, 6)
+    .map((c) => ({
+      id: -c.id,
+      rating: ratingToStars(c.rating_avg),
+      comment: null,
+      created_at: null,
+      author_label: '',
+      is_aggregate: true,
+      clinic: {
+        id: c.id,
+        name: c.name,
+        township: c.township,
+        area: c.area,
+        rating_avg: c.rating_avg,
+        total_reviews: c.total_reviews ?? 0,
+      },
+    }))
 }
 
 export function HomePage() {
@@ -111,28 +140,41 @@ export function HomePage() {
     }
   }, [])
 
-  useEffect(() => {
-    let cancelled = false
-    ;(async () => {
-      try {
-        const { data } = await api.get<{ data: ClinicReviewItem[] }>(
-          '/api/reviews/recent?limit=6',
-        )
-        if (!cancelled) {
-          setReviews(Array.isArray(data?.data) ? data.data : [])
-          setReviewsError(null)
-        }
-      } catch (e) {
-        if (!cancelled) {
-          setReviewsError(getApiErrorMessage(e))
-          setReviews([])
-        }
-      }
-    })()
-    return () => {
-      cancelled = true
+  const loadRecentReviews = useCallback(async () => {
+    try {
+      const { data } = await api.get<{ data: ClinicReviewItem[] }>(
+        '/api/reviews/recent?limit=6',
+      )
+      setReviews(Array.isArray(data?.data) ? data.data : [])
+      setReviewsError(null)
+    } catch (e) {
+      setReviewsError(getApiErrorMessage(e))
+      setReviews([])
     }
   }, [])
+
+  useEffect(() => {
+    void loadRecentReviews()
+  }, [loadRecentReviews])
+
+  useEffect(() => {
+    const onRefresh = () => {
+      void loadRecentReviews()
+    }
+    window.addEventListener(RECENT_REVIEWS_EVENT, onRefresh)
+    window.addEventListener('focus', onRefresh)
+    return () => {
+      window.removeEventListener(RECENT_REVIEWS_EVENT, onRefresh)
+      window.removeEventListener('focus', onRefresh)
+    }
+  }, [loadRecentReviews])
+
+  const displayReviews = useMemo(() => {
+    if (reviews == null) return null
+    if (reviews.length > 0) return reviews
+    if (clinics == null) return null
+    return clinicsToReviewHighlights(clinics)
+  }, [reviews, clinics])
 
   const onKeyModal = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') setArticle(null)
@@ -275,6 +317,22 @@ export function HomePage() {
             </div>
           </motion.div>
         </section>
+
+        <HomeClinicReviewsSection
+          reviews={displayReviews}
+          error={reviewsError}
+          labels={{
+            title: t.home.reviewsSectionTitle,
+            subtitle: t.home.reviewsSectionSub,
+            empty: t.home.reviewsEmpty,
+            loading: t.home.reviewsLoading,
+            findClinic: t.nav.findClinic,
+            anonymousNote: t.home.reviewsAnonymousNote,
+            aggregateBadge: t.home.reviewsAggregateBadge,
+            aggregateNote: t.home.reviewsAggregateNote,
+            reviewsLabel: t.home.reviewsLabel,
+          }}
+        />
 
         <section className="border-y border-white/40 bg-gradient-to-b from-white/50 to-stone-50/80 py-16 backdrop-blur-md">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
@@ -442,19 +500,6 @@ export function HomePage() {
             )}
           </div>
         </section>
-
-        <HomeClinicReviewsSection
-          reviews={reviews}
-          error={reviewsError}
-          labels={{
-            title: t.home.reviewsSectionTitle,
-            subtitle: t.home.reviewsSectionSub,
-            empty: t.home.reviewsEmpty,
-            loading: t.home.reviewsLoading,
-            findClinic: t.nav.findClinic,
-            anonymousNote: t.home.reviewsAnonymousNote,
-          }}
-        />
 
         <section className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
           <HomeLibrarySection

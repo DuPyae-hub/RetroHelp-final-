@@ -4,12 +4,13 @@ import { fadeUp, staggerContainer, staggerItem } from '../lib/motionPresets'
 import type { ClinicReviewItem } from '../types/api'
 
 function Stars({ rating }: { rating: number }) {
+  const clamped = Math.min(5, Math.max(1, Math.round(rating)))
   return (
-    <span className="inline-flex gap-0.5" aria-label={`${rating} out of 5`}>
+    <span className="inline-flex gap-0.5" aria-label={`${clamped} out of 5`}>
       {[1, 2, 3, 4, 5].map((n) => (
         <span
           key={n}
-          className={n <= rating ? 'text-amber-400' : 'text-stone-300'}
+          className={n <= clamped ? 'text-amber-400' : 'text-stone-300'}
           aria-hidden
         >
           ★
@@ -32,6 +33,13 @@ function formatWhen(iso: string | null): string {
   }
 }
 
+function formatRating(avg: string | number | null | undefined): string {
+  if (avg === null || avg === undefined || avg === '') return '—'
+  const n = typeof avg === 'number' ? avg : Number.parseFloat(String(avg))
+  if (!Number.isFinite(n)) return '—'
+  return n.toFixed(1)
+}
+
 type Props = {
   reviews: ClinicReviewItem[] | null
   error: string | null
@@ -42,16 +50,22 @@ type Props = {
     loading: string
     findClinic: string
     anonymousNote: string
+    aggregateBadge: string
+    aggregateNote: string
+    reviewsLabel: string
   }
 }
 
 export function HomeClinicReviewsSection({ reviews, error, labels }: Props) {
+  const hasCards = reviews != null && reviews.length > 0
+
   return (
     <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-16">
       <motion.div
         variants={fadeUp}
         initial="hidden"
-        whileInView="visible"
+        animate={hasCards ? 'visible' : undefined}
+        whileInView={hasCards ? undefined : 'visible'}
         viewport={{ once: true, margin: '-40px' }}
         className="mb-8 max-w-2xl"
       >
@@ -82,8 +96,7 @@ export function HomeClinicReviewsSection({ reviews, error, labels }: Props) {
         <motion.div
           variants={staggerContainer}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-24px' }}
+          animate="visible"
           className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
         >
           {reviews.map((r) => (
@@ -94,13 +107,28 @@ export function HomeClinicReviewsSection({ reviews, error, labels }: Props) {
             >
               <div className="flex items-start justify-between gap-2">
                 <Stars rating={r.rating} />
-                {r.created_at ? (
+                {r.is_aggregate ? (
+                  <span className="shrink-0 rounded-full bg-teal-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-teal-900">
+                    {labels.aggregateBadge}
+                  </span>
+                ) : r.created_at ? (
                   <time className="shrink-0 text-[11px] text-stone-400" dateTime={r.created_at}>
                     {formatWhen(r.created_at)}
                   </time>
                 ) : null}
               </div>
-              {r.comment ? (
+              {r.is_aggregate ? (
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-stone-700">
+                  <span className="font-bold text-stone-900">
+                    {formatRating(r.clinic?.rating_avg ?? r.rating)}
+                  </span>
+                  <span className="text-stone-500">
+                    {' '}
+                    · {r.clinic?.total_reviews ?? 0} {labels.reviewsLabel}
+                  </span>
+                  <span className="mt-2 block text-xs text-stone-500">{labels.aggregateNote}</span>
+                </p>
+              ) : r.comment ? (
                 <p className="mt-3 flex-1 text-sm leading-relaxed text-stone-700">
                   &ldquo;{r.comment}&rdquo;
                 </p>
@@ -108,7 +136,9 @@ export function HomeClinicReviewsSection({ reviews, error, labels }: Props) {
                 <p className="mt-3 flex-1 text-sm italic text-stone-500">—</p>
               )}
               <div className="mt-4 border-t border-orange-50 pt-3">
-                <p className="text-xs font-semibold text-stone-500">{r.author_label}</p>
+                {!r.is_aggregate ? (
+                  <p className="text-xs font-semibold text-stone-500">{r.author_label}</p>
+                ) : null}
                 {r.clinic ? (
                   <Link
                     to={`/find-clinic?center=${r.clinic.id}`}

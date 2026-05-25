@@ -15,6 +15,8 @@ export type ClinicReviewItem = {
   comment: string | null
   created_at: string | null
   author_label: string
+  /** True when card shows clinic aggregate (no individual comment row yet). */
+  is_aggregate?: boolean
   clinic: {
     id: number
     name: string

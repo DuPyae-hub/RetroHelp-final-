@@ -21,6 +21,8 @@ class PublicReviewController extends Controller
         }
 
         $rows = Review::query()
+            ->whereBetween('rating', [1, 5])
+            ->whereHas('clinic')
             ->with([
                 'clinic:id,name,township,area,rating_avg,total_reviews',
                 'user:id,nickname',

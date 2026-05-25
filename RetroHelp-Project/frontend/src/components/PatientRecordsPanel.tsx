@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { api, getApiErrorMessage } from '../api/client'
+import { notifyRecentReviewsUpdated } from '../lib/reviewsEvents'
 import { isCommunityMember } from '../constants/roles'
 import { BookingStatusMascot } from './BookingStatusMascot'
 import { useAuth } from '../context/AuthContext'
@@ -277,6 +278,7 @@ export function PatientRecordsPanel() {
           rating: reviewRating,
           comment: trimmed || null,
         })
+        notifyRecentReviewsUpdated()
       } else {
         await api.patch(`/api/bookings/${bookingId}/complete`, {})
       }
